@@ -52,7 +52,7 @@ else
 
 endif
 
-OBJS =  $(SOURCE_PATHS)\pckman_main.c $(SOURCE_PATHS)\pckman_graphics.c
+OBJS =  $(SOURCE_PATHS)\pckman_main.c $(SOURCE_PATHS)\pckman_graphics.c $(SOURCE_PATHS)\pckman_puckman.c
 OBJ_NAME = puckman
 
 #This is the target that compiles our executable 

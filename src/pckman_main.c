@@ -14,7 +14,19 @@ int loadAssets()
 {
     int error_code = 0;
 
-    // pacman_loadSprite();
+    // pkm_puckman_loadSprite();
+    // pkm_maze_loadSprite();
+    // pkm_blinky_loadSprite();
+    // pkm_inky_loadSprite();
+    // pkm_pinky_loadSprite();
+    // pkm_clyde_loadSprite();
+    // pkm_weakGhost_loadSprite();
+    // pkm_pallets_loadSprite();
+    // pkm_fruits_loadSprite():
+    // pkm_menu_loadSprite();
+
+    // pkm_font_load();
+    // pkm_audio_load();
 
     return error_code;
 }
@@ -27,6 +39,8 @@ void displayWindow()
 /// @brief Initialize the SDL System, Create the window at the center of the screen and then get the renderer
 /// @return
 ///         0 - if no error
+///        -1 - window creation error
+///        -2 - renderer creation error
 int initGame()
 {
     int error_code;
@@ -52,6 +66,7 @@ int initGame()
 
         if (_mainWindow == NULL)
         {
+            SDL_Log("Unable to create Window!!");
             error_code = -1;
         }
         else
@@ -59,7 +74,10 @@ int initGame()
             _mainRenderer = SDL_CreateRenderer(_mainWindow, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
             if (_mainRenderer == NULL)
+            {
+                SDL_Log("Unable to create Renderer!!");
                 error_code = -2;
+            }
         }
     }
 
@@ -115,7 +133,7 @@ int main(int argc, char *args[])
         printf("ERORR in initialisation\n");
     }
 
-    quiteGame();
+    quitGame();
 
     return 0;
 }
