@@ -1,4 +1,5 @@
 #include "pckman_puckman.h"
+#include <stdbool.h>
 
 const SDL_Texture *_puckmanAliveTexture;
 const SDL_Texture *_puckmanDeadTexture;
@@ -7,6 +8,7 @@ int _puckmanState = PUCKMAN_ALIVE;
 int _puckmanWakaCount = 0;
 int _puckmanDeadCount = 0;
 int _puckmanDirection = PUCKMAN_RIGHT;
+bool _puckmanDirectionIsChanged = false;
 
 extern int puckman_load_sprite(const SDL_Renderer *renderer)
 {
@@ -93,9 +95,10 @@ extern int puckman_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Ren
 
         // for now we just render the first sprite sequence alive puckman
         sourceRect.x = (_puckmanWakaCount * 16);
-        sourceRect.y = 0;
+        sourceRect.y = (_puckmanDirection * 16);
         sourceRect.w = PKM_PUCKMAN_WIDTH;
         sourceRect.h = PKM_PUCKMAN_HEIGHT;
+
         error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
 
         // update the sequence
@@ -103,17 +106,17 @@ extern int puckman_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Ren
         {
             switch (_puckmanWakaCount)
             {
-            case 0:
-                _puckmanWakaCount++;
+            case PUCKMAN_FULL:
+                _puckmanWakaCount++; // update the next animation to mouth open
                 break;
-            case 1:
-                _puckmanWakaCount++;
+            case PUCKMAN_OPEN:
+                _puckmanWakaCount++; // update the next animation to mouth wide
                 break;
-            case 2:
-                _puckmanWakaCount++;
+            case PUCKMAN_WIDE:
+                _puckmanWakaCount++; // update the next animation to mouth closing
                 break;
-            case 3:
-                _puckmanWakaCount = 0;
+            case PUCKMAN_CLOSE:
+                _puckmanWakaCount = 0; // update the next animation to fully closed
                 break;
             default:
                 break;
@@ -123,4 +126,24 @@ extern int puckman_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Ren
 
 end:
     return error_code;
+}
+
+extern void puckman_setDirectionRight()
+{
+    _puckmanDirection = PUCKMAN_RIGHT;
+}
+
+extern void puckman_setDirectionLeft()
+{
+    _puckmanDirection = PUCKMAN_LEFT;
+}
+
+extern void puckman_setDirectionUp()
+{
+    _puckmanDirection = PUCKMAN_UP;
+}
+
+extern void puckman_setDirectionDown()
+{
+    _puckmanDirection = PUCKMAN_DOWN;
 }

@@ -64,7 +64,7 @@ int initGame()
     Uint32 ticks;
 
     // intialize all the main application variables
-    sprintf(gameTitle, "%s version %d.%d", PKM_MAIN_APPNAME, PKM_MAIN_MAJOR, PKM_MAIN_MINOR);
+    sprintf(gameTitle, "%s version %s.%s", PKM_MAIN_APPNAME, PKM_MAIN_MAJOR, PKM_MAIN_MINOR);
 
     // initialize SDL and its subsystem here
     error_code = SDL_Init(SDL_INIT_EVERYTHING);
@@ -144,19 +144,16 @@ int main(int argc, char *args[])
             SDL_RenderPresent(_mainRenderer);
             ticks = SDL_GetTicks();
 
-            SDL_Log("Hello world from SDL2.\n");
-
             while (quit_flag == false)
             {
                 nextTick = SDL_GetTicks();
                 Uint32 diffTick = nextTick - ticks;
 
-                if (diffTick >= 60)
+                if (diffTick >= PKM_MAIN_WAKA_TIME)
                 {
                     // animate
                     SDL_RenderClear(_mainRenderer);
                     puckman_animate(_mainRenderer, &centerRect);
-                    SDL_Log("ticktok! - %dms", diffTick);
                     ticks = SDL_GetTicks();
                     SDL_RenderPresent(_mainRenderer);
                 }
@@ -166,6 +163,31 @@ int main(int argc, char *args[])
                     {
                         quit_flag = true;
                         SDL_Log("Program quit after %i ticks!\n", e.quit.timestamp);
+                    }
+                    else if (e.type == SDL_KEYDOWN)
+                    {
+                        SDL_KeyCode keycode = e.key.keysym.sym;
+
+                        if ((keycode == SDLK_a) || (keycode == SDLK_LEFT))
+                        {
+                            SDL_Log("Puckman direction LEFT ->");
+                            puckman_setDirectionLeft();
+                        }
+                        else if ((keycode == SDLK_d) || (keycode == SDLK_RIGHT))
+                        {
+                            SDL_Log("Puckman direction RIGHT <-");
+                            puckman_setDirectionRight();
+                        }
+                        else if ((keycode == SDLK_w) || (keycode == SDLK_UP))
+                        {
+                            SDL_Log("Puckman direction UP ^");
+                            puckman_setDirectionUp();
+                        }
+                        else if ((keycode == SDLK_s) || (keycode == SDLK_DOWN))
+                        {
+                            SDL_Log("Puckman direction DOWN v");
+                            puckman_setDirectionDown();
+                        }
                     }
                 }
             }
