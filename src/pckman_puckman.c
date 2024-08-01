@@ -1,10 +1,14 @@
 #include "pckman_puckman.h"
 
-const int _puckmanState = PUCKMAN_ALIVE;
 const SDL_Texture *_puckmanAliveTexture;
 const SDL_Texture *_puckmanDeadTexture;
 
-extern int puckman_loadAsset(const SDL_Renderer *renderer)
+int _puckmanState = PUCKMAN_ALIVE;
+int _puckmanWakaCount = 0;
+int _puckmanDeadCount = 0;
+int _puckmanDirection = PUCKMAN_RIGHT;
+
+extern int puckman_load_sprite(const SDL_Renderer *renderer)
 {
     int error_code = 0;
     SDL_Surface *pmanAliveSurface = NULL;
@@ -59,11 +63,64 @@ end:
     return error_code;
 }
 
-extern void puckman_freeAsset()
+extern void puckman_free_sprite()
 {
     if (_puckmanAliveTexture != NULL)
         SDL_DestroyTexture(_puckmanAliveTexture);
 
     if (_puckmanDeadTexture != NULL)
         SDL_DestroyTexture(_puckmanDeadTexture);
+}
+
+extern int puckman_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render)
+{
+    int error_code;
+    SDL_Rect sourceRect = {0,
+                           0,
+                           0,
+                           0};
+
+    if (renderer == NULL)
+    {
+        error_code = 2005;
+        goto end;
+    }
+    else
+    {
+        // render the current state of puckman to the pos2Render
+
+        // TODO: check the current state of Puckman (Alive or Dead?)
+
+        // for now we just render the first sprite sequence alive puckman
+        sourceRect.x = (_puckmanWakaCount * 16);
+        sourceRect.y = 0;
+        sourceRect.w = PKM_PUCKMAN_WIDTH;
+        sourceRect.h = PKM_PUCKMAN_HEIGHT;
+        error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
+
+        // update the sequence
+        if (_puckmanState == PUCKMAN_ALIVE)
+        {
+            switch (_puckmanWakaCount)
+            {
+            case 0:
+                _puckmanWakaCount++;
+                break;
+            case 1:
+                _puckmanWakaCount++;
+                break;
+            case 2:
+                _puckmanWakaCount++;
+                break;
+            case 3:
+                _puckmanWakaCount = 0;
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+end:
+    return error_code;
 }

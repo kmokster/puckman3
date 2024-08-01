@@ -1,20 +1,26 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL.h>
+#include <SDL_timer.h>
 
 // #include "pckman_graphics.h"
 #include "pckman_main.h"
 #include "pckman_state.h"
+#include "pckman_puckman.h"
 
 // define all the main components
 const SDL_Window *_mainWindow = NULL;
 const SDL_Renderer *_mainRenderer = NULL;
 
+// the base layer texture
+SDL_Texture *_mainTexture = NULL;
+
 int loadAssets()
 {
     int error_code = 0;
 
-    // pkm_puckman_loadSprite();
+    error_code = puckman_load_sprite(_mainRenderer);
+
     // pkm_maze_loadSprite();
     // pkm_blinky_loadSprite();
     // pkm_inky_loadSprite();
@@ -28,7 +34,13 @@ int loadAssets()
     // pkm_font_load();
     // pkm_audio_load();
 
+end:
     return error_code;
+}
+
+void unloadAssets()
+{
+    puckman_free_sprite();
 }
 
 void displayWindow()
@@ -47,13 +59,17 @@ int initGame()
     int win_x;
     int win_y;
     SDL_DisplayMode display_mode;
+    SDL_Surface main_surface;
     char gameTitle[64];
+    Uint32 ticks;
 
     // intialize all the main application variables
     sprintf(gameTitle, "%s version %d.%d", PKM_MAIN_APPNAME, PKM_MAIN_MAJOR, PKM_MAIN_MINOR);
 
     // initialize SDL and its subsystem here
     error_code = SDL_Init(SDL_INIT_EVERYTHING);
+
+    SDL_Init(SDL_INIT_TIMER);
 
     if (error_code == 0)
     {
@@ -78,6 +94,10 @@ int initGame()
                 SDL_Log("Unable to create Renderer!!");
                 error_code = -2;
             }
+            else
+            {
+                _mainTexture = SDL_CreateTexture(_mainRenderer, SDL_PIXELFORMAT_RGBX8888, SDL_TEXTUREACCESS_STREAMING, 640, 480);
+            }
         }
     }
 
@@ -86,6 +106,10 @@ int initGame()
 
 int quitGame()
 {
+
+    if (_mainTexture != NULL)
+        SDL_DestroyTexture(_mainTexture);
+
     if (_mainRenderer != NULL)
         SDL_DestroyRenderer(_mainRenderer);
 
@@ -100,21 +124,42 @@ int main(int argc, char *args[])
     int error_code;
     bool quit_flag = false;
     SDL_Event e;
+    SDL_Rect centerRect = {(PKM_MAIN_WIN_WIDTH - 16) / 2,
+                           (PKM_MAIN_WIN_HEIGHT - 16) / 2,
+                           16, 16};
+    Uint32 ticks, nextTick;
 
     error_code = initGame();
 
     if (error_code == 0)
     {
-        displayWindow();
+        error_code = loadAssets();
 
         if ((error_code == 0))
         {
-            SDL_Log("Hello world from SDL2.\n");
+            displayWindow();
+            // clear the renderer
+            SDL_RenderClear(_mainRenderer);
+            puckman_animate(_mainRenderer, &centerRect);
+            SDL_RenderPresent(_mainRenderer);
+            ticks = SDL_GetTicks();
 
-            loadAssets();
+            SDL_Log("Hello world from SDL2.\n");
 
             while (quit_flag == false)
             {
+                nextTick = SDL_GetTicks();
+                Uint32 diffTick = nextTick - ticks;
+
+                if (diffTick >= 60)
+                {
+                    // animate
+                    SDL_RenderClear(_mainRenderer);
+                    puckman_animate(_mainRenderer, &centerRect);
+                    SDL_Log("ticktok! - %dms", diffTick);
+                    ticks = SDL_GetTicks();
+                    SDL_RenderPresent(_mainRenderer);
+                }
                 while (SDL_PollEvent(&e) != 0)
                 {
                     if (e.type == SDL_QUIT)
@@ -125,7 +170,7 @@ int main(int argc, char *args[])
                 }
             }
 
-            // unloadAssets();
+            unloadAssets();
         }
     }
     else
