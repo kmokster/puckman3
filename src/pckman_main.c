@@ -7,6 +7,7 @@
 #include "pckman_main.h"
 #include "pckman_state.h"
 #include "pckman_puckman.h"
+#include "pckman_game.h"
 
 // define all the main components
 const SDL_Window *_mainWindow = NULL;
@@ -14,6 +15,10 @@ const SDL_Renderer *_mainRenderer = NULL;
 
 // the base layer texture
 SDL_Texture *_mainTexture = NULL;
+
+// calculate the row and height for the grid
+const int _mainGridRows = PKM_MAIN_WIN_HEIGHT / PKM_MAIN_CELL_HEIGHT;
+const int _mainGridColumns = PKM_MAIN_WIN_WIDTH / PKM_MAIN_CELL_WIDTH;
 
 int loadAssets()
 {
@@ -46,6 +51,36 @@ void unloadAssets()
 void displayWindow()
 {
     SDL_ShowWindow(_mainWindow);
+}
+
+// draw the grid
+void drawGrid()
+{
+    Uint8 u8r, u8g, u8b, u8a; // store the current color
+
+    SDL_GetRenderDrawColor(_mainRenderer, &u8r, &u8g, &u8b, &u8a);
+    SDL_SetRenderDrawBlendMode(_mainRenderer, SDL_BLENDMODE_BLEND); // new blend mode for alpha
+    SDL_SetRenderDrawColor(_mainRenderer,
+                           PKM_MAIN_GRID_COLOR_R,
+                           PKM_MAIN_GRID_COLOR_G,
+                           PKM_MAIN_GRID_COLOR_B,
+                           PKM_MAIN_GRID_COLOR_A);
+
+    // draw the row first
+    for (int row = PKM_MAIN_CELL_HEIGHT; row < PKM_MAIN_WIN_HEIGHT; row += PKM_MAIN_CELL_HEIGHT)
+    {
+        SDL_RenderDrawLine(_mainRenderer, 0, row, PKM_MAIN_WIN_WIDTH, row);
+    }
+
+    // draw the column next
+    for (int column = PKM_MAIN_CELL_WIDTH; column < PKM_MAIN_WIN_WIDTH; column += PKM_MAIN_CELL_WIDTH)
+    {
+        SDL_RenderDrawLine(_mainRenderer, column, 0, column, PKM_MAIN_WIN_HEIGHT);
+    }
+
+    SDL_SetRenderDrawBlendMode(_mainRenderer, SDL_BLENDMODE_NONE);
+
+    SDL_SetRenderDrawColor(_mainRenderer, u8r, u8g, u8b, u8a);
 }
 
 /// @brief Initialize the SDL System, Create the window at the center of the screen and then get the renderer
@@ -124,10 +159,10 @@ int main(int argc, char *args[])
     int error_code;
     bool quit_flag = false;
     SDL_Event e;
-    SDL_Rect centerRect = {(PKM_MAIN_WIN_WIDTH - 16) / 2,
-                           (PKM_MAIN_WIN_HEIGHT - 16) / 2,
-                           16, 16};
-    Uint32 ticks, nextTick;
+    SDL_Rect puckmanRect = {(PKM_MAIN_WIN_WIDTH - 16) / 2,
+                            (PKM_MAIN_WIN_HEIGHT - 16) / 2,
+                            16, 16};
+    Uint32 ticks, nextTick, lastWakaTick, wakaTick;
 
     error_code = initGame();
 
@@ -140,21 +175,42 @@ int main(int argc, char *args[])
             displayWindow();
             // clear the renderer
             SDL_RenderClear(_mainRenderer);
-            puckman_animate(_mainRenderer, &centerRect);
+            drawGrid();
+            puckman_alive_animate(_mainRenderer, &puckmanRect);
             SDL_RenderPresent(_mainRenderer);
             ticks = SDL_GetTicks();
 
             while (quit_flag == false)
             {
                 nextTick = SDL_GetTicks();
-                Uint32 diffTick = nextTick - ticks;
+                wakaTick = nextTick - lastWakaTick;
 
-                if (diffTick >= PKM_MAIN_WAKA_TIME)
+                // TODO
+                // A redesign of the animation sequence needs to be done
+                // the speed of both the waka and the movement has to be brought down
+                // so better to test both movement and waka speed to see if it hits
+                // if so then go into the clear screen and figure out if this is a
+                // waka or a move
+                //
+                // there is a possibility that the waka maybe slower than the move
+
+                if (wakaTick >= PKM_MAIN_WAKA_TIME)
                 {
                     // animate
                     SDL_RenderClear(_mainRenderer);
-                    puckman_animate(_mainRenderer, &centerRect);
-                    ticks = SDL_GetTicks();
+                    drawGrid();
+                    puckman_alive_animate(_mainRenderer, &puckmanRect);
+
+                    if (puckmanRect.x >= PKM_MAIN_REGULAR_SPEED)
+                    {
+                        puckmanRect.x = puckmanRect.x - PKM_MAIN_REGULAR_SPEED;
+                        if (puckmanRect.x < 0)
+                        {
+                            puckmanRect.x = 0;
+                        }
+                    }
+
+                    lastWakaTick = SDL_GetTicks();
                     SDL_RenderPresent(_mainRenderer);
                 }
                 while (SDL_PollEvent(&e) != 0)

@@ -1,10 +1,28 @@
-#include "pckman_puckman.h"
+/**
+ * @file pckman_puckman.c
+ * @author kmokster
+ * @brief
+ *
+ * contains all functions that animates the puckman character
+ * it never tracks the logic of puckman
+ * just pure graphical animation
+ *
+ * @version 0.1
+ * @date 2024-08-04
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+
 #include <stdbool.h>
+
+#include "pckman_puckman.h"
+#include "pckman_state.h"
 
 const SDL_Texture *_puckmanAliveTexture;
 const SDL_Texture *_puckmanDeadTexture;
 
-int _puckmanState = PUCKMAN_ALIVE;
+// int _puckmanState = PUCKMAN_ALIVE;
 int _puckmanWakaCount = 0;
 int _puckmanDeadCount = 0;
 int _puckmanDirection = PUCKMAN_RIGHT;
@@ -74,7 +92,7 @@ extern void puckman_free_sprite()
         SDL_DestroyTexture(_puckmanDeadTexture);
 }
 
-extern int puckman_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render)
+extern int puckman_alive_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render)
 {
     int error_code;
     SDL_Rect sourceRect = {0,
@@ -94,33 +112,30 @@ extern int puckman_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Ren
         // TODO: check the current state of Puckman (Alive or Dead?)
 
         // for now we just render the first sprite sequence alive puckman
-        sourceRect.x = (_puckmanWakaCount * 16);
-        sourceRect.y = (_puckmanDirection * 16);
+        sourceRect.x = (_puckmanWakaCount * PKM_PUCKMAN_WIDTH);
+        sourceRect.y = (_puckmanDirection * PKM_PUCKMAN_HEIGHT);
         sourceRect.w = PKM_PUCKMAN_WIDTH;
         sourceRect.h = PKM_PUCKMAN_HEIGHT;
 
         error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
 
         // update the sequence
-        if (_puckmanState == PUCKMAN_ALIVE)
+        switch (_puckmanWakaCount)
         {
-            switch (_puckmanWakaCount)
-            {
-            case PUCKMAN_FULL:
-                _puckmanWakaCount++; // update the next animation to mouth open
-                break;
-            case PUCKMAN_OPEN:
-                _puckmanWakaCount++; // update the next animation to mouth wide
-                break;
-            case PUCKMAN_WIDE:
-                _puckmanWakaCount++; // update the next animation to mouth closing
-                break;
-            case PUCKMAN_CLOSE:
-                _puckmanWakaCount = 0; // update the next animation to fully closed
-                break;
-            default:
-                break;
-            }
+        case PUCKMAN_FULL:
+            _puckmanWakaCount++; // update the next animation to mouth open
+            break;
+        case PUCKMAN_OPEN:
+            _puckmanWakaCount++; // update the next animation to mouth wide
+            break;
+        case PUCKMAN_WIDE:
+            _puckmanWakaCount++; // update the next animation to mouth closing
+            break;
+        case PUCKMAN_CLOSE:
+            _puckmanWakaCount = 0; // update the next animation to fully closed
+            break;
+        default:
+            break;
         }
     }
 

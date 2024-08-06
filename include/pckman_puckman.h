@@ -8,21 +8,6 @@
 #define PKM_PUCKMAN_WIDTH 16
 #define PKM_PUCKMAN_HEIGHT 16
 
-enum PUCKMAN_STATE
-{
-    PUCKMAN_ALIVE, // puckman is alive but weak so ghost can kill em
-    PUCKMAN_AGGRO, // puckman is now in aggro state and can eat ghost
-    PUCKMAN_DEAD   // puckman is dead
-};
-
-enum PUCKMAN_DIRECTION
-{
-    PUCKMAN_RIGHT = 0, // puckman is moving right
-    PUCKMAN_LEFT = 1,  // puckman is moving left
-    PUCKMAN_UP = 2,    // puckman is moving up
-    PUCKMAN_DOWN = 3,  // puckman is moving down
-};
-
 // the PUCKMAN_WAKA is the represenation of the 4 sequence in which puckman is animated
 enum PUCKMAN_WAKA
 {
@@ -35,7 +20,7 @@ enum PUCKMAN_WAKA
 extern int puckman_load_sprite(const SDL_Renderer *renderer);
 extern void puckman_free_sprite();
 
-extern int puckman_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render);
+extern int puckman_alive_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render);
 
 extern void puckman_setDirectionRight();
 extern void puckman_setDirectionLeft();
