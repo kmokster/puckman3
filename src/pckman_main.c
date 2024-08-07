@@ -131,8 +131,20 @@ int initGame()
             }
             else
             {
-                _mainTexture = SDL_CreateTexture(_mainRenderer, SDL_PIXELFORMAT_RGBX8888, SDL_TEXTUREACCESS_STREAMING, 640, 480);
+                // _mainTexture = SDL_CreateTexture(_mainRenderer,
+                // SDL_PIXELFORMAT_RGBX8888,
+                // SDL_TEXTUREACCESS_STREAMING,
+                // 640, 480);
+
+                _mainTexture = SDL_CreateTexture(_mainRenderer,
+                                                 SDL_PIXELFORMAT_RGBX8888,
+                                                 SDL_TEXTUREACCESS_STREAMING,
+                                                 PKM_MAIN_WIN_WIDTH, PKM_MAIN_WIN_HEIGHT);
             }
+
+            // initialize the main game logic controller
+            SDL_Log("initializing the main game logic");
+            pkm_game_init();
         }
     }
 
@@ -159,10 +171,10 @@ int main(int argc, char *args[])
     int error_code;
     bool quit_flag = false;
     SDL_Event e;
-    SDL_Rect puckmanRect = {(PKM_MAIN_WIN_WIDTH - 16) / 2,
-                            (PKM_MAIN_WIN_HEIGHT - 16) / 2,
-                            16, 16};
-    Uint32 ticks, nextTick, lastWakaTick, wakaTick;
+    SDL_Rect puckmanRect;
+    Uint32 lastTick, nextTick, diffTick;
+    int wakaFrameCount = 0;
+    int gameFrameCount = 0;
 
     error_code = initGame();
 
@@ -172,18 +184,25 @@ int main(int argc, char *args[])
 
         if ((error_code == 0))
         {
+            puckmanRect.x = pkm_game_getPuckmanLocation().x;
+            puckmanRect.y = pkm_game_getPuckmanLocation().y,
+            puckmanRect.w = PKM_MAIN_CHAR_WIDTH;  // 32px
+            puckmanRect.h = PKM_MAIN_CHAR_HEIGHT; // 32px
+
             displayWindow();
             // clear the renderer
             SDL_RenderClear(_mainRenderer);
             drawGrid();
+
             puckman_alive_animate(_mainRenderer, &puckmanRect);
+
             SDL_RenderPresent(_mainRenderer);
-            ticks = SDL_GetTicks();
+            lastTick = SDL_GetTicks();
 
             while (quit_flag == false)
             {
                 nextTick = SDL_GetTicks();
-                wakaTick = nextTick - lastWakaTick;
+                diffTick = nextTick - lastTick;
 
                 // TODO
                 // A redesign of the animation sequence needs to be done
@@ -194,24 +213,38 @@ int main(int argc, char *args[])
                 //
                 // there is a possibility that the waka maybe slower than the move
 
-                if (wakaTick >= PKM_MAIN_WAKA_TIME)
+                if (diffTick >= PKM_MAIN_FPS) // going into FPS
                 {
                     // animate
-                    SDL_RenderClear(_mainRenderer);
-                    drawGrid();
-                    puckman_alive_animate(_mainRenderer, &puckmanRect);
+                    SDL_RenderClear(_mainRenderer); // clear the screen
+                    drawGrid();                     // draw the grid for now
 
-                    if (puckmanRect.x >= PKM_MAIN_REGULAR_SPEED)
+                    if (wakaFrameCount == PKM_MAIN_WAKA_FRAME_COUNT)
                     {
-                        puckmanRect.x = puckmanRect.x - PKM_MAIN_REGULAR_SPEED;
-                        if (puckmanRect.x < 0)
-                        {
-                            puckmanRect.x = 0;
-                        }
+                        // do the animation
+                        puckman_alive_animate2(_mainRenderer, true, &puckmanRect);
+                        wakaFrameCount = 0;
+                    }
+                    else
+                    {
+                        puckman_alive_animate2(_mainRenderer, false, &puckmanRect);
+                        wakaFrameCount++;
                     }
 
-                    lastWakaTick = SDL_GetTicks();
+                    if (gameFrameCount == PKM_MAIN_GAME_FRAME_COUNT)
+                    {
+                        // update the game first
+                        pkm_game_movePuckman(); // move puckman by the number of pixel
+                        gameFrameCount = 0;     // reset the game frame count
+                    }
+                    else
+                    {
+                        gameFrameCount++;
+                    }
+
                     SDL_RenderPresent(_mainRenderer);
+
+                    lastTick = SDL_GetTicks();
                 }
                 while (SDL_PollEvent(&e) != 0)
                 {
@@ -227,22 +260,38 @@ int main(int argc, char *args[])
                         if ((keycode == SDLK_a) || (keycode == SDLK_LEFT))
                         {
                             SDL_Log("Puckman direction LEFT ->");
-                            puckman_setDirectionLeft();
+                            // NOTE:
+                            // we let the pckman_game determine if it is possible to set a direction
+                            // so it checks for correctness or collision etc.
+                            // then we pass the result to pckman_puckman to render
+                            pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_LEFT);
+                            puckman_setDirection(pkm_game_getPuckmanDirection());
+                            puckman_setHealthStatus(pkm_game_getPuckmanHealthStatus());
+                            puckman_setAliveStatus(pkm_game_getPuckmanAliveStatus());
                         }
                         else if ((keycode == SDLK_d) || (keycode == SDLK_RIGHT))
                         {
                             SDL_Log("Puckman direction RIGHT <-");
-                            puckman_setDirectionRight();
+                            pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_RIGHT);
+                            puckman_setDirection(pkm_game_getPuckmanDirection());
+                            puckman_setHealthStatus(pkm_game_getPuckmanHealthStatus());
+                            puckman_setAliveStatus(pkm_game_getPuckmanAliveStatus());
                         }
                         else if ((keycode == SDLK_w) || (keycode == SDLK_UP))
                         {
                             SDL_Log("Puckman direction UP ^");
-                            puckman_setDirectionUp();
+                            pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_UP);
+                            puckman_setDirection(pkm_game_getPuckmanDirection());
+                            puckman_setHealthStatus(pkm_game_getPuckmanHealthStatus());
+                            puckman_setAliveStatus(pkm_game_getPuckmanAliveStatus());
                         }
                         else if ((keycode == SDLK_s) || (keycode == SDLK_DOWN))
                         {
                             SDL_Log("Puckman direction DOWN v");
-                            puckman_setDirectionDown();
+                            pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_DOWN);
+                            puckman_setDirection(pkm_game_getPuckmanDirection());
+                            puckman_setHealthStatus(pkm_game_getPuckmanHealthStatus());
+                            puckman_setAliveStatus(pkm_game_getPuckmanAliveStatus());
                         }
                     }
                 }

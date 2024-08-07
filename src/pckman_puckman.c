@@ -22,10 +22,12 @@
 const SDL_Texture *_puckmanAliveTexture;
 const SDL_Texture *_puckmanDeadTexture;
 
-// int _puckmanState = PUCKMAN_ALIVE;
+int _puckmanHealthState = PUCKMAN_ALIVE;
+int _puckmanAliveState = PUCKMAN_ALIVE_START;
+int _puckmanDirection = PUCKMAN_DIRECTION_NONE;
+
 int _puckmanWakaCount = 0;
 int _puckmanDeadCount = 0;
-int _puckmanDirection = PUCKMAN_RIGHT;
 bool _puckmanDirectionIsChanged = false;
 
 extern int puckman_load_sprite(const SDL_Renderer *renderer)
@@ -92,6 +94,16 @@ extern void puckman_free_sprite()
         SDL_DestroyTexture(_puckmanDeadTexture);
 }
 
+extern void puckman_setHealthStatus(int status)
+{
+    _puckmanHealthState = status;
+}
+
+extern void puckman_setAliveStatus(int status)
+{
+    _puckmanAliveState = status;
+}
+
 extern int puckman_alive_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render)
 {
     int error_code;
@@ -116,6 +128,9 @@ extern int puckman_alive_animate(const SDL_Renderer *renderer, const SDL_Rect *p
         sourceRect.y = (_puckmanDirection * PKM_PUCKMAN_HEIGHT);
         sourceRect.w = PKM_PUCKMAN_WIDTH;
         sourceRect.h = PKM_PUCKMAN_HEIGHT;
+
+        SDL_Log("puckman_alive_animate pos2Render.x = %d", pos2Render->x);
+        SDL_Log("puckman_alive_animate pos2Render.y = %d", pos2Render->y);
 
         error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
 
@@ -143,22 +158,119 @@ end:
     return error_code;
 }
 
+extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame, const SDL_Rect *pos2Render)
+{
+    int error_code;
+    SDL_Rect sourceRect = {0,
+                           0,
+                           0,
+                           0};
+
+    if (renderer == NULL)
+    {
+        error_code = 2005;
+        goto end;
+    }
+    else
+    {
+        // render the current state of puckman to the pos2Render
+
+        // TODO: check the current state of Puckman (Alive or Dead?)
+
+        // when puckman is alive and is moving
+        if (_puckmanHealthState == PUCKMAN_ALIVE)
+        {
+            if (_puckmanAliveState == PUCKMAN_ALIVE_MOVING)
+            {
+                sourceRect.x = (_puckmanWakaCount * PKM_PUCKMAN_WIDTH);
+                sourceRect.y = (_puckmanDirection * PKM_PUCKMAN_HEIGHT);
+                sourceRect.w = PKM_PUCKMAN_WIDTH;
+                sourceRect.h = PKM_PUCKMAN_HEIGHT;
+
+                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
+
+                if (nextFrame)
+                { // update the sequence
+                    switch (_puckmanWakaCount)
+                    {
+                    case PUCKMAN_FULL:
+                        _puckmanWakaCount++; // update the next animation to mouth open
+                        break;
+                    case PUCKMAN_OPEN:
+                        _puckmanWakaCount++; // update the next animation to mouth wide
+                        break;
+                    case PUCKMAN_WIDE:
+                        _puckmanWakaCount++; // update the next animation to mouth closing
+                        break;
+                    case PUCKMAN_CLOSE:
+                        _puckmanWakaCount = 0; // update the next animation to fully closed
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+            else if ((_puckmanAliveState == PUCKMAN_ALIVE_STOP))
+            {
+                // it has stopped somewhere so do the open mouth
+            }
+            else if (_puckmanAliveState == PUCKMAN_ALIVE_START)
+            {
+                // it is at the start position
+                sourceRect.x = 0;
+                sourceRect.y = 0;
+                sourceRect.w = PKM_PUCKMAN_WIDTH;
+                sourceRect.h = PKM_PUCKMAN_HEIGHT;
+
+                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
+            }
+        }
+    }
+
+end:
+    return error_code;
+}
+
+// TEMPORARY FUNCTIONS JUST TO TEST THE PASSING OF
+// STATES between thegame logic and puckman graphic functions
+
+extern void puckman_setDirection(int direction)
+{
+    switch (direction)
+    {
+    case PUCKMAN_DIRECTION_LEFT:
+        puckman_setDirectionLeft();
+        return;
+    case PUCKMAN_DIRECTION_RIGHT:
+        puckman_setDirectionRight();
+        return;
+    case PUCKMAN_DIRECTION_UP:
+        puckman_setDirectionUp();
+        return;
+    case PUCKMAN_DIRECTION_DOWN:
+        puckman_setDirectionDown();
+        return;
+    default:
+        return;
+    }
+}
+
 extern void puckman_setDirectionRight()
 {
-    _puckmanDirection = PUCKMAN_RIGHT;
+    _puckmanDirection = PUCKMAN_DIRECTION_RIGHT;
 }
 
 extern void puckman_setDirectionLeft()
 {
-    _puckmanDirection = PUCKMAN_LEFT;
+    _puckmanDirection = PUCKMAN_DIRECTION_LEFT;
 }
 
 extern void puckman_setDirectionUp()
 {
-    _puckmanDirection = PUCKMAN_UP;
+    _puckmanDirection = PUCKMAN_DIRECTION_UP;
 }
 
 extern void puckman_setDirectionDown()
 {
-    _puckmanDirection = PUCKMAN_DOWN;
+    _puckmanDirection = PUCKMAN_DIRECTION_DOWN;
 }
