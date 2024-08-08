@@ -219,15 +219,17 @@ int main(int argc, char *args[])
                     SDL_RenderClear(_mainRenderer); // clear the screen
                     drawGrid();                     // draw the grid for now
 
+                    bool wakaRefresh = false;
+
                     if (wakaFrameCount == PKM_MAIN_WAKA_FRAME_COUNT)
                     {
                         // do the animation
-                        puckman_alive_animate2(_mainRenderer, true, &puckmanRect);
+                        wakaRefresh = true;
                         wakaFrameCount = 0;
                     }
                     else
                     {
-                        puckman_alive_animate2(_mainRenderer, false, &puckmanRect);
+                        wakaRefresh = false;
                         wakaFrameCount++;
                     }
 
@@ -235,13 +237,21 @@ int main(int argc, char *args[])
                     {
                         // update the game first
                         pkm_game_movePuckman(); // move puckman by the number of pixel
-                        gameFrameCount = 0;     // reset the game frame count
+                        puckmanRect.x = pkm_game_getPuckmanLocation().x;
+                        puckmanRect.y = pkm_game_getPuckmanLocation().y,
+                        puckmanRect.w = PKM_MAIN_CHAR_WIDTH;  // 32px
+                        puckmanRect.h = PKM_MAIN_CHAR_HEIGHT; // 32px
+
+                        // SDL_Log("PuckmanRect.x is %d", puckmanRect.x);
+                        // SDL_Log("PuckmanRect.y is %d", puckmanRect.y);
+
+                        gameFrameCount = 0; // reset the game frame count
                     }
                     else
                     {
                         gameFrameCount++;
                     }
-
+                    puckman_alive_animate2(_mainRenderer, wakaRefresh, &puckmanRect);
                     SDL_RenderPresent(_mainRenderer);
 
                     lastTick = SDL_GetTicks();

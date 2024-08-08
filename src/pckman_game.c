@@ -124,16 +124,27 @@ extern void pkm_game_movePuckman()
             // we now await for gamer to send us the next direction
             _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
         }
+        else
+        {
+            _pkm_game.puckman.location.x = puckman_x;
+        }
         return;
     case PUCKMAN_DIRECTION_RIGHT:
-        puckman_x = puckman_x + pixel2move;
+        // this forward check have to check for the puckman position being off screen
+        // this is because we are using the top left co-ordinate as reference
+        puckman_x = puckman_x + (pixel2move + PKM_MAIN_CHAR_WIDTH);
         if (puckman_x >= PKM_MAIN_WIN_WIDTH)
         {
-            puckman_x = PKM_MAIN_WIN_WIDTH;
+            puckman_x = (PKM_MAIN_WIN_WIDTH - PKM_MAIN_CHAR_WIDTH);
             // this will hopefully cause the puckman render to just display puckman in a open mouth status
             _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_STOP;
             // we now await for gamer to send us the next direction
             _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
+        }
+        else
+        {
+            // need to remove the offset
+            _pkm_game.puckman.location.x = puckman_x - PKM_MAIN_CHAR_WIDTH;
         }
         return;
     case PUCKMAN_DIRECTION_UP:
@@ -144,14 +155,24 @@ extern void pkm_game_movePuckman()
             _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_STOP;
             _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
         }
+        else
+        {
+            _pkm_game.puckman.location.y = puckman_y;
+        }
         return;
     case PUCKMAN_DIRECTION_DOWN:
-        puckman_y = puckman_y + pixel2move;
+        // this check have to offset the height
+        // otherwise the render goes off screen
+        puckman_y = puckman_y + (pixel2move + PKM_MAIN_CHAR_HEIGHT);
         if (puckman_y >= PKM_MAIN_WIN_HEIGHT)
         {
-            puckman_y = PKM_MAIN_WIN_HEIGHT;
+            puckman_y = PKM_MAIN_WIN_HEIGHT - PKM_MAIN_CHAR_HEIGHT;
             _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_STOP;
             _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
+        }
+        else
+        {
+            _pkm_game.puckman.location.y = puckman_y - PKM_MAIN_CHAR_HEIGHT;
         }
         return;
     default: // no direction and its just at the start of the game

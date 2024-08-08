@@ -12,10 +12,13 @@
 #define PKM_MAIN_WIN_WIDTH 496
 #define PKM_MAIN_WIN_HEIGHT 640
 
-#define PKM_MAIN_WAKA_FRAME_COUNT 3 // we waka every 4 frames?
-#define PKM_MAIN_GAME_FRAME_COUNT 6 // we update the game every 6 frames?
-#define PKM_MAIN_REGULAR_SPEED 4    // use 4 pixel movement for regular speed
-#define PKM_MAIN_UP_SPEED 6         // use 6 pixel movement for speed ups
+// frame count before updates
+#define PKM_MAIN_WAKA_FRAME_COUNT 2 // we waka every 4 frames?
+#define PKM_MAIN_GAME_FRAME_COUNT 3 // we update the game every 6 frames?
+
+// the number of pixel to move
+#define PKM_MAIN_REGULAR_SPEED 4 // use 4 pixel movement for regular speed
+#define PKM_MAIN_UP_SPEED 6      // use 6 pixel movement for speed ups
 
 #define PKM_MAIN_CELL_WIDTH 16
 #define PKM_MAIN_CELL_HEIGHT 16
