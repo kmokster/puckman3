@@ -20,6 +20,9 @@ SDL_Texture *_mainTexture = NULL;
 const int _mainGridRows = PKM_MAIN_WIN_HEIGHT / PKM_MAIN_CELL_HEIGHT;
 const int _mainGridColumns = PKM_MAIN_WIN_WIDTH / PKM_MAIN_CELL_WIDTH;
 
+// make the 60fps
+const float _mainFPS = 1000 / PKM_MAIN_FPS;
+
 int loadAssets()
 {
     int error_code = 0;
@@ -122,8 +125,8 @@ int initGame()
         }
         else
         {
-            _mainRenderer = SDL_CreateRenderer(_mainWindow, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
+            // _mainRenderer = SDL_CreateRenderer(_mainWindow, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+            _mainRenderer = SDL_CreateRenderer(_mainWindow, 0, SDL_RENDERER_ACCELERATED);
             if (_mainRenderer == NULL)
             {
                 SDL_Log("Unable to create Renderer!!");
@@ -172,9 +175,11 @@ int main(int argc, char *args[])
     bool quit_flag = false;
     SDL_Event e;
     SDL_Rect puckmanRect;
-    Uint32 lastTick, nextTick, diffTick;
-    int wakaFrameCount = 0;
-    int gameFrameCount = 0;
+    float lastTick, nextTick, diffTick;
+    float wakaFrameCount = 0;
+    float puckmanMoveFrameCount = 0;
+
+    float numPixelMoved = 0;
 
     error_code = initGame();
 
@@ -194,15 +199,15 @@ int main(int argc, char *args[])
             SDL_RenderClear(_mainRenderer);
             drawGrid();
 
-            puckman_alive_animate(_mainRenderer, &puckmanRect);
+            puckman_alive_animate2(_mainRenderer, true, &puckmanRect);
 
             SDL_RenderPresent(_mainRenderer);
             lastTick = SDL_GetTicks();
 
             while (quit_flag == false)
             {
-                nextTick = SDL_GetTicks();
-                diffTick = nextTick - lastTick;
+                nextTick = (float)SDL_GetTicks();
+                diffTick = (float)(nextTick - lastTick);
 
                 // TODO
                 // A redesign of the animation sequence needs to be done
@@ -213,14 +218,13 @@ int main(int argc, char *args[])
                 //
                 // there is a possibility that the waka maybe slower than the move
 
-                if (diffTick >= PKM_MAIN_FPS) // going into FPS
+                if (diffTick >= _mainFPS) // going into FPS
                 {
                     // animate
                     SDL_RenderClear(_mainRenderer); // clear the screen
                     drawGrid();                     // draw the grid for now
 
                     bool wakaRefresh = false;
-
                     if (wakaFrameCount == PKM_MAIN_WAKA_FRAME_COUNT)
                     {
                         // do the animation
@@ -233,10 +237,11 @@ int main(int argc, char *args[])
                         wakaFrameCount++;
                     }
 
-                    if (gameFrameCount == PKM_MAIN_GAME_FRAME_COUNT)
+                    // this section moves puckman base on the speed delta in wich puckman moves
+                    if (puckmanMoveFrameCount >= PKM_MAIN_GAME_FRAME_COUNT)
                     {
                         // update the game first
-                        pkm_game_movePuckman(); // move puckman by the number of pixel
+                        pkm_game_updateGame(); // move puckman by the number of pixel
                         puckmanRect.x = pkm_game_getPuckmanLocation().x;
                         puckmanRect.y = pkm_game_getPuckmanLocation().y,
                         puckmanRect.w = PKM_MAIN_CHAR_WIDTH;  // 32px
@@ -245,13 +250,15 @@ int main(int argc, char *args[])
                         // SDL_Log("PuckmanRect.x is %d", puckmanRect.x);
                         // SDL_Log("PuckmanRect.y is %d", puckmanRect.y);
 
-                        gameFrameCount = 0; // reset the game frame count
+                        puckmanMoveFrameCount = 0; // reset the game frame count
                     }
                     else
                     {
-                        gameFrameCount++;
+                        puckmanMoveFrameCount = puckmanMoveFrameCount + (1 * pkm_game_getPuckmanSpeedDelta());
                     }
+
                     puckman_alive_animate2(_mainRenderer, wakaRefresh, &puckmanRect);
+                    // puckman_animate(_mainRenderer, &pkm_game_getPuckmanStructure);
                     SDL_RenderPresent(_mainRenderer);
 
                     lastTick = SDL_GetTicks();

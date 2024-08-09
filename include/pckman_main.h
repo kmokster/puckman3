@@ -7,10 +7,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define PKM_MAIN_MAJOR "0"
-#define PKM_MAIN_MINOR "03"
+#define PKM_MAIN_MINOR "04"
 #define PKM_MAIN_APPNAME "PUCKMAN"
-
-#define PKM_MAIN_FPS 1000 / 60 //  60 frames per second for our refresh rate
 
 #define PKM_MAIN_GRID_ON true
 

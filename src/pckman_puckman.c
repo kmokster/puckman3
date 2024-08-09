@@ -16,12 +16,14 @@
 
 #include <stdbool.h>
 
+#include "pckman_game.h"
 #include "pckman_puckman.h"
 #include "pckman_state.h"
 
 const SDL_Texture *_puckmanAliveTexture;
 const SDL_Texture *_puckmanDeadTexture;
 
+// TODO: to remove the following since we are now taking all the states from the game
 int _puckmanHealthState = PUCKMAN_ALIVE;
 int _puckmanAliveState = PUCKMAN_ALIVE_START;
 int _puckmanDirection = PUCKMAN_DIRECTION_NONE;
@@ -104,59 +106,59 @@ extern void puckman_setAliveStatus(int status)
     _puckmanAliveState = status;
 }
 
-extern int puckman_alive_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render)
-{
-    int error_code;
-    SDL_Rect sourceRect = {0,
-                           0,
-                           0,
-                           0};
+// extern int puckman_alive_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render)
+// {
+//     int error_code;
+//     SDL_Rect sourceRect = {0,
+//                            0,
+//                            0,
+//                            0};
 
-    if (renderer == NULL)
-    {
-        error_code = 2005;
-        goto end;
-    }
-    else
-    {
-        // render the current state of puckman to the pos2Render
+//     if (renderer == NULL)
+//     {
+//         error_code = 2005;
+//         goto end;
+//     }
+//     else
+//     {
+//         // render the current state of puckman to the pos2Render
 
-        // TODO: check the current state of Puckman (Alive or Dead?)
+//         // TODO: check the current state of Puckman (Alive or Dead?)
 
-        // for now we just render the first sprite sequence alive puckman
-        sourceRect.x = (_puckmanWakaCount * PKM_PUCKMAN_WIDTH);
-        sourceRect.y = (_puckmanDirection * PKM_PUCKMAN_HEIGHT);
-        sourceRect.w = PKM_PUCKMAN_WIDTH;
-        sourceRect.h = PKM_PUCKMAN_HEIGHT;
+//         // for now we just render the first sprite sequence alive puckman
+//         sourceRect.x = (_puckmanWakaCount * PKM_PUCKMAN_WIDTH);
+//         sourceRect.y = (_puckmanDirection * PKM_PUCKMAN_HEIGHT);
+//         sourceRect.w = PKM_PUCKMAN_WIDTH;
+//         sourceRect.h = PKM_PUCKMAN_HEIGHT;
 
-        SDL_Log("puckman_alive_animate pos2Render.x = %d", pos2Render->x);
-        SDL_Log("puckman_alive_animate pos2Render.y = %d", pos2Render->y);
+//         SDL_Log("puckman_alive_animate pos2Render.x = %d", pos2Render->x);
+//         SDL_Log("puckman_alive_animate pos2Render.y = %d", pos2Render->y);
 
-        error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
+//         error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
 
-        // update the sequence
-        switch (_puckmanWakaCount)
-        {
-        case PUCKMAN_FULL:
-            _puckmanWakaCount++; // update the next animation to mouth open
-            break;
-        case PUCKMAN_OPEN:
-            _puckmanWakaCount++; // update the next animation to mouth wide
-            break;
-        case PUCKMAN_WIDE:
-            _puckmanWakaCount++; // update the next animation to mouth closing
-            break;
-        case PUCKMAN_CLOSE:
-            _puckmanWakaCount = 0; // update the next animation to fully closed
-            break;
-        default:
-            break;
-        }
-    }
+//         // update the sequence
+//         switch (_puckmanWakaCount)
+//         {
+//         case PUCKMAN_FULL:
+//             _puckmanWakaCount++; // update the next animation to mouth open
+//             break;
+//         case PUCKMAN_OPEN:
+//             _puckmanWakaCount++; // update the next animation to mouth wide
+//             break;
+//         case PUCKMAN_WIDE:
+//             _puckmanWakaCount++; // update the next animation to mouth closing
+//             break;
+//         case PUCKMAN_CLOSE:
+//             _puckmanWakaCount = 0; // update the next animation to fully closed
+//             break;
+//         default:
+//             break;
+//         }
+//     }
 
-end:
-    return error_code;
-}
+// end:
+//     return error_code;
+// }
 
 extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame, const SDL_Rect *pos2Render)
 {
@@ -178,9 +180,19 @@ extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame, 
         // TODO: check the current state of Puckman (Alive or Dead?)
 
         // when puckman is alive and is moving
-        if (_puckmanHealthState == PUCKMAN_ALIVE)
+        if (pkm_game_getPuckmanHealthStatus() == PUCKMAN_ALIVE)
         {
-            if (_puckmanAliveState == PUCKMAN_ALIVE_MOVING)
+            if (pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_START) // the game has just started
+            {
+                // map it to the first frame in the puckman sprite
+                sourceRect.x = 0;
+                sourceRect.y = 0;
+                sourceRect.w = PKM_PUCKMAN_WIDTH;
+                sourceRect.h = PKM_PUCKMAN_HEIGHT;
+
+                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
+            }
+            else if (pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_MOVING)
             {
                 sourceRect.x = (_puckmanWakaCount * PKM_PUCKMAN_WIDTH);
                 sourceRect.y = (_puckmanDirection * PKM_PUCKMAN_HEIGHT);
@@ -210,15 +222,14 @@ extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame, 
                     }
                 }
             }
-            else if ((_puckmanAliveState == PUCKMAN_ALIVE_STOP))
+            else if ((pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_STOP))
             {
-                // it has stopped somewhere so do the open mouth
-            }
-            else if (_puckmanAliveState == PUCKMAN_ALIVE_START)
-            {
-                // it is at the start position
-                sourceRect.x = 0;
-                sourceRect.y = 0;
+                // map it to the first frame in the puckman sprite
+
+                // TODO: get this working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                sourceRect.x = 16;
+                sourceRect.y = pkm_game_getPuckmanDirection() * PKM_MAIN_CELL_HEIGHT;
                 sourceRect.w = PKM_PUCKMAN_WIDTH;
                 sourceRect.h = PKM_PUCKMAN_HEIGHT;
 

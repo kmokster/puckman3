@@ -18,37 +18,44 @@
 /// @brief structure to track puckman
 typedef struct puckman_character_structure
 {
-    SDL_Point location; // set the location of puckman
-    int health_status;  // tracks the health of puckman
-    int alive_status;   // tracks the status while puckman is still alive
-    int direction;      // tracks the current direction of puckman
+    SDL_Point current_location; // set the location of puckman
+    SDL_Point last_location;    // the last location for more efficient render processing
+    int health_status;          // tracks the health of puckman
+    int alive_status;           // tracks the status while puckman is still alive
+    int direction;              // tracks the current direction of puckman
+    float speed_delta;          // current puckman speed base on game level
 } _puckmanStatus;
 
+// use to track the status and location of the ghost
 typedef struct ghost_character_structure
 {
-    SDL_Point location;
-    int health_status;
-    int alive_status;
+    SDL_Point current_location;
+    SDL_Point last_location;
+    int current_status; // home, chase, scatter, frightened or spawning
     int direction;
+    float speed_delta;
 } _ghostStatus;
 
 struct puckman_game_structure
 {
     Uint32 high_score;
     Uint32 current_score;
+
     // maze data store
     //  pallet data store
     _puckmanStatus puckman;
-    _ghostStatus blink;
+    _ghostStatus blinky;
     _ghostStatus pinky;
     _ghostStatus inky;
     _ghostStatus clyde;
     int puckman_lives_left;
     // struct for fruits
 
-    int puckman_direction;
+    // int puckman_direction;
 } _pkm_game;
 
+// TODO: declare as static?
+// here is where we track all the life time variables
 int _gameHiScore = 0; // track the games hi score
 
 extern void pkm_game_init()
@@ -60,14 +67,17 @@ extern void pkm_game_init()
     _pkm_game.puckman.health_status = PUCKMAN_ALIVE;
     _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_START;
     _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
+    _pkm_game.puckman.speed_delta = 1.0;
 
     // initialize the puckman starting position
     // for now at the center of the screen
-    _pkm_game.puckman.location.x = (PKM_MAIN_WIN_WIDTH - PKM_MAIN_CHAR_WIDTH) / 2;
-    _pkm_game.puckman.location.y = (PKM_MAIN_WIN_HEIGHT - PKM_MAIN_CHAR_HEIGHT) / 2;
+    _pkm_game.puckman.current_location.x = (PKM_MAIN_WIN_WIDTH - PKM_MAIN_CHAR_WIDTH) / 2;
+    _pkm_game.puckman.current_location.y = (PKM_MAIN_WIN_HEIGHT - PKM_MAIN_CHAR_HEIGHT) / 2;
+    _pkm_game.puckman.last_location.x = _pkm_game.puckman.current_location.x;
+    _pkm_game.puckman.last_location.y = _pkm_game.puckman.current_location.y;
 
-    SDL_Log("x location for puckman is: %d", _pkm_game.puckman.location.x);
-    SDL_Log("y location for puckman is: %d", _pkm_game.puckman.location.y);
+    SDL_Log("x location for puckman is: %d", _pkm_game.puckman.current_location.x);
+    SDL_Log("y location for puckman is: %d", _pkm_game.puckman.current_location.y);
 
     // loadMazeMap();
 }
@@ -79,7 +89,10 @@ extern void pkm_game_quit()
 extern void pkm_game_setPuckmanDirection(int direction)
 {
     _pkm_game.puckman.direction = direction;
-    _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_MOVING;
+
+    if (_pkm_game.puckman.alive_status != PUCKMAN_ALIVE_STOP)
+        _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_MOVING;
+
     return;
 }
 
@@ -100,15 +113,25 @@ extern int pkm_game_getPuckmanAliveStatus()
 
 extern SDL_Point pkm_game_getPuckmanLocation()
 {
-    return _pkm_game.puckman.location;
+    return _pkm_game.puckman.current_location;
+}
+
+extern float pkm_game_getPuckmanSpeedDelta()
+{
+    return _pkm_game.puckman.speed_delta;
 }
 
 /// @brief
-extern void pkm_game_movePuckman()
+extern void pkm_game_updateGame()
 {
     int pixel2move = PKM_MAIN_REGULAR_SPEED;
-    int puckman_x = _pkm_game.puckman.location.x;
-    int puckman_y = _pkm_game.puckman.location.y;
+
+    int puckman_x = _pkm_game.puckman.current_location.x;
+    int puckman_y = _pkm_game.puckman.current_location.y;
+
+    // set the current location to the last location
+    _pkm_game.puckman.last_location.x = puckman_x;
+    _pkm_game.puckman.last_location.y = puckman_y;
 
     switch (_pkm_game.puckman.direction)
     {
@@ -121,12 +144,12 @@ extern void pkm_game_movePuckman()
             // set the puckman to stop
             // this will hopefully cause the puckman render to just display puckman in a open mouth status
             _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_STOP;
-            // we now await for gamer to send us the next direction
-            _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
         }
         else
         {
-            _pkm_game.puckman.location.x = puckman_x;
+            // move the puckman in the direction
+            _pkm_game.puckman.current_location.x = puckman_x;
+            _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_MOVING;
         }
         return;
     case PUCKMAN_DIRECTION_RIGHT:
@@ -138,13 +161,12 @@ extern void pkm_game_movePuckman()
             puckman_x = (PKM_MAIN_WIN_WIDTH - PKM_MAIN_CHAR_WIDTH);
             // this will hopefully cause the puckman render to just display puckman in a open mouth status
             _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_STOP;
-            // we now await for gamer to send us the next direction
-            _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
         }
         else
         {
             // need to remove the offset
-            _pkm_game.puckman.location.x = puckman_x - PKM_MAIN_CHAR_WIDTH;
+            _pkm_game.puckman.current_location.x = puckman_x - PKM_MAIN_CHAR_WIDTH;
+            _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_MOVING;
         }
         return;
     case PUCKMAN_DIRECTION_UP:
@@ -153,11 +175,11 @@ extern void pkm_game_movePuckman()
         {
             puckman_y = 0;
             _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_STOP;
-            _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
         }
         else
         {
-            _pkm_game.puckman.location.y = puckman_y;
+            _pkm_game.puckman.current_location.y = puckman_y;
+            _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_MOVING;
         }
         return;
     case PUCKMAN_DIRECTION_DOWN:
@@ -168,11 +190,11 @@ extern void pkm_game_movePuckman()
         {
             puckman_y = PKM_MAIN_WIN_HEIGHT - PKM_MAIN_CHAR_HEIGHT;
             _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_STOP;
-            _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
         }
         else
         {
-            _pkm_game.puckman.location.y = puckman_y - PKM_MAIN_CHAR_HEIGHT;
+            _pkm_game.puckman.current_location.y = puckman_y - PKM_MAIN_CHAR_HEIGHT;
+            _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_MOVING;
         }
         return;
     default: // no direction and its just at the start of the game

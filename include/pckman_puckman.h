@@ -20,7 +20,7 @@ enum PUCKMAN_WAKA
 extern int puckman_load_sprite(const SDL_Renderer *renderer);
 extern void puckman_free_sprite();
 
-extern int puckman_alive_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render);
+// extern int puckman_alive_animate(const SDL_Renderer *renderer, const SDL_Rect *pos2Render);
 extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame, const SDL_Rect *pos2Render);
 
 extern void puckman_setHealthStatus(int status);
