@@ -1,13 +1,22 @@
-#include <stdio.h>
+/**
+ * @file pckman_main.c
+ * @author Kevin Mok
+ * @brief
+ * @version 0.1
+ * @date 2024-08-10
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #include <stdbool.h>
 #include <SDL.h>
 #include <SDL_timer.h>
 
-// #include "pckman_graphics.h"
 #include "pckman_main.h"
 #include "pckman_state.h"
 #include "pckman_puckman.h"
 #include "pckman_game.h"
+#include "pckman_error.h"
 
 // define all the main components
 const SDL_Window *_mainWindow = NULL;
@@ -23,11 +32,100 @@ const int _mainGridColumns = PKM_MAIN_WIN_WIDTH / PKM_MAIN_CELL_WIDTH;
 // make the 60fps
 const float _mainFPS = 1000 / PKM_MAIN_FPS;
 
+/// @brief Initialize the SDL System, Create the window at the center of the screen and then get the renderer
+/// @return
+///         0 - if no error
+///        -1 - window creation error
+///        -2 - renderer creation error
+int initGame()
+{
+    int error_code = 0;
+
+    int win_x;                    // x co-ordinate of the window to display
+    int win_y;                    // y co-ordinate of the window to display
+    SDL_DisplayMode display_mode; // use to enquire the size of the monitor screen
+    SDL_Surface main_surface;
+
+    char gameTitle[128];
+    Uint32 ticks;
+
+    // format the game title
+    sprintf(gameTitle, "%s version %s.%s", PKM_MAIN_APPNAME, PKM_MAIN_MAJOR, PKM_MAIN_MINOR);
+
+    // initialize SDL and its subsystem
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
+        error_code = PKM_ERROR_MAIN_INIT_SDL_INIT;
+        goto error;
+    }
+
+    // use display mode to determine the size of the screen
+    if (SDL_GetCurrentDisplayMode(0, &display_mode) != 0)
+    {
+        error_code = PKM_ERROR_MAIN_INIT_SDL_DISP;
+        goto error;
+    }
+
+    // for now find the halfway mark to set where puckman should be displayed at
+    // TODO: check if this is a required step since the start pos is determined by pckman_game
+    win_x = (display_mode.w - PKM_MAIN_WIN_WIDTH) / 2;
+    win_y = (display_mode.h - PKM_MAIN_WIN_HEIGHT) / 2;
+
+    // create the main window in HIDE mode first
+    _mainWindow = SDL_CreateWindow(gameTitle, win_x, win_y, PKM_MAIN_WIN_WIDTH, PKM_MAIN_WIN_HEIGHT, SDL_WINDOW_HIDDEN);
+
+    if (_mainWindow == NULL)
+    {
+        error_code = PKM_ERROR_MAIN_INIT_SDL_CWIN;
+        goto error;
+    }
+
+    // create the Renderer
+    _mainRenderer = SDL_CreateRenderer(_mainWindow, 0, SDL_RENDERER_ACCELERATED);
+    if (_mainRenderer == NULL)
+    {
+        error_code = PKM_ERROR_MAIN_INIT_SDL_REND;
+        goto error;
+    }
+
+    // Get the background texture to the whole window
+    // TODO: check if this is required or where is should it be created and stored?
+    _mainTexture = SDL_CreateTexture(_mainRenderer,
+                                     SDL_PIXELFORMAT_RGBX8888,
+                                     SDL_TEXTUREACCESS_STREAMING,
+                                     PKM_MAIN_WIN_WIDTH, PKM_MAIN_WIN_HEIGHT);
+
+    if (_mainTexture == NULL)
+    {
+        error_code = PKM_ERROR_MAIN_INIT_SDL_TEXT;
+        goto error;
+    }
+
+    // TODO - 10/8
+    // move game init to the main game loop?
+    pkm_game_init(); // initialise the game structure
+
+    goto end;
+
+error:
+    SDL_Log("main::initGame Game Init Error: %d", error_code);
+    return error_code;
+
+end:
+    SDL_Log("main::initGame Game Init successful!");
+    return 0;
+}
+
+/// @brief use to load all assets for the game e.g. images, audio etc
+/// @return 0 if no error
 int loadAssets()
 {
     int error_code = 0;
 
     error_code = puckman_load_sprite(_mainRenderer);
+
+    if (error_code != 0)
+        goto error;
 
     // pkm_maze_loadSprite();
     // pkm_blinky_loadSprite();
@@ -42,7 +140,14 @@ int loadAssets()
     // pkm_font_load();
     // pkm_audio_load();
 
+    goto end;
+
+error:
+    SDL_Log("main:loadAssets loadAsset error: %d", error_code);
+    return error_code;
+
 end:
+    SDL_Log("main:loadAssets loadAsset successful: %d", error_code);
     return error_code;
 }
 
@@ -86,74 +191,6 @@ void drawGrid()
     SDL_SetRenderDrawColor(_mainRenderer, u8r, u8g, u8b, u8a);
 }
 
-/// @brief Initialize the SDL System, Create the window at the center of the screen and then get the renderer
-/// @return
-///         0 - if no error
-///        -1 - window creation error
-///        -2 - renderer creation error
-int initGame()
-{
-    int error_code;
-    int win_x;
-    int win_y;
-    SDL_DisplayMode display_mode;
-    SDL_Surface main_surface;
-    char gameTitle[64];
-    Uint32 ticks;
-
-    // intialize all the main application variables
-    sprintf(gameTitle, "%s version %s.%s", PKM_MAIN_APPNAME, PKM_MAIN_MAJOR, PKM_MAIN_MINOR);
-
-    // initialize SDL and its subsystem here
-    error_code = SDL_Init(SDL_INIT_EVERYTHING);
-
-    SDL_Init(SDL_INIT_TIMER);
-
-    if (error_code == 0)
-    {
-        // use display mode to determine the size of the screen
-        error_code = SDL_GetCurrentDisplayMode(0, &display_mode);
-        win_x = (display_mode.w - PKM_MAIN_WIN_WIDTH) / 2;
-        win_y = (display_mode.h - PKM_MAIN_WIN_HEIGHT) / 2;
-
-        _mainWindow = SDL_CreateWindow(gameTitle, win_x, win_y, PKM_MAIN_WIN_WIDTH, PKM_MAIN_WIN_HEIGHT, SDL_WINDOW_HIDDEN);
-
-        if (_mainWindow == NULL)
-        {
-            SDL_Log("Unable to create Window!!");
-            error_code = -1;
-        }
-        else
-        {
-            // _mainRenderer = SDL_CreateRenderer(_mainWindow, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-            _mainRenderer = SDL_CreateRenderer(_mainWindow, 0, SDL_RENDERER_ACCELERATED);
-            if (_mainRenderer == NULL)
-            {
-                SDL_Log("Unable to create Renderer!!");
-                error_code = -2;
-            }
-            else
-            {
-                // _mainTexture = SDL_CreateTexture(_mainRenderer,
-                // SDL_PIXELFORMAT_RGBX8888,
-                // SDL_TEXTUREACCESS_STREAMING,
-                // 640, 480);
-
-                _mainTexture = SDL_CreateTexture(_mainRenderer,
-                                                 SDL_PIXELFORMAT_RGBX8888,
-                                                 SDL_TEXTUREACCESS_STREAMING,
-                                                 PKM_MAIN_WIN_WIDTH, PKM_MAIN_WIN_HEIGHT);
-            }
-
-            // initialize the main game logic controller
-            SDL_Log("initializing the main game logic");
-            pkm_game_init();
-        }
-    }
-
-    return error_code;
-}
-
 int quitGame()
 {
 
@@ -169,23 +206,27 @@ int quitGame()
     SDL_Quit();
 }
 
+/// @brief The main function.
+/// @param argc
+/// @param args
+/// @return
 int main(int argc, char *args[])
 {
     int error_code;
-    bool quit_flag = false;
-    SDL_Event e;
+    bool quit_flag = false; // track if user hit quit button or close the window
+    SDL_Event e;            // track all events
     SDL_Rect puckmanRect;
     float lastTick, nextTick, diffTick;
     float wakaFrameCount = 0;
     float puckmanMoveFrameCount = 0;
 
-    float numPixelMoved = 0;
-
-    error_code = initGame();
+    error_code = initGame(); // initialise SDL etc.
 
     if (error_code == 0)
     {
-        error_code = loadAssets();
+        error_code = loadAssets(); // load all game assets.
+
+        /////////////// END OF CLEAN UP 13/8 ////////////////////
 
         if ((error_code == 0))
         {

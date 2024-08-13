@@ -1,7 +1,7 @@
 /**
  * @file pckman_game.c
- * @author your name (you@domain.com)
- * @brief
+ * @author Kevin Mok
+ * @brief This is the game logic for the entire game
  * @version 0.1
  * @date 2024-08-04
  *
@@ -31,7 +31,8 @@ typedef struct ghost_character_structure
 {
     SDL_Point current_location;
     SDL_Point last_location;
-    int current_status; // home, chase, scatter, frightened or spawning
+    SDL_Point target_location; // the target tile to move to
+    int current_status;        // home, chase, scatter, frightened or spawning
     int direction;
     float speed_delta;
 } _ghostStatus;
@@ -58,9 +59,9 @@ struct puckman_game_structure
 // here is where we track all the life time variables
 int _gameHiScore = 0; // track the games hi score
 
-extern void pkm_game_init()
+void pkm_game_reset()
 {
-    _pkm_game.high_score = _gameHiScore;
+    // reset the current score to 0
     _pkm_game.current_score = 0;
 
     // setup the puckman health
@@ -80,6 +81,12 @@ extern void pkm_game_init()
     SDL_Log("y location for puckman is: %d", _pkm_game.puckman.current_location.y);
 
     // loadMazeMap();
+}
+
+extern void pkm_game_init()
+{
+    _pkm_game.high_score = _gameHiScore;
+    pkm_game_reset();
 }
 
 extern void pkm_game_quit()

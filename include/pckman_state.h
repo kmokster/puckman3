@@ -23,9 +23,9 @@ extern enum PKM_PUCKMAN_HEALTH_STATE {
 };
 
 extern enum PKM_PUCKMAN_ALIVE_STATE {
-    PUCKMAN_ALIVE_START,  // its at the start position
-    PUCKMAN_ALIVE_MOVING, // puckman is moving
-    PUCKMAN_ALIVE_STOP    // puckman is stopped
+    PUCKMAN_ALIVE_START = 0,  // its at the start position
+    PUCKMAN_ALIVE_MOVING = 1, // puckman is moving
+    PUCKMAN_ALIVE_STOP = 2    // puckman is stopped
 };
 
 extern enum PKM_GHOST_CHASE_DIRECTION {
@@ -41,13 +41,13 @@ extern enum PKM_GHOST_STATE {
     GHOST_CHASE,      // ghost is hunting puckman
     GHOST_SCATTER,    // ghost gives up the chase for a few seconds and return to their home corner
     GHOST_FRIGHTENED, // ghost is weak and running away from puckman
-    GHOST_SPAWNING,   // ghost is dead and going home to spawn
+    GHOST_EASTEN      // ghost is dead and going home to spawn
 };
 
 extern enum PKM_MAIN_STATE {
     GAME_MAIN_MENU = 0,
     GAME_MAIN_PLAYING = 1,
-    GAME_MAIN_SCREENSAVER = 2,
+    GAME_MAIN_SCREENSAVER = 2
 };
 
 extern enum PKM_MENU_STATE {

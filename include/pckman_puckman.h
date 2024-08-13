@@ -7,14 +7,20 @@
 #define PKM_PUCKMAN_DIE_BMP "./res/graphics/PuckMan-Die.bmp"
 #define PKM_PUCKMAN_WIDTH 16
 #define PKM_PUCKMAN_HEIGHT 16
+#define PKM_PUCKMAN_WAKA_SPRITE_X_FRAME 4
+#define PKM_PUCKMAN_WAKA_SPRITE_Y_FRAME 4
+#define PKM_PUCKMAN_DIE_SPRITE_X_FRAME 10
+#define PKM_PUCKMAN_DIE_SPRITE_Y_FRAME 1
+
+#define PKM_PUCKMAN_TRANSPARENT_COLOR 0x00FFFF
 
 // the PUCKMAN_WAKA is the represenation of the 4 sequence in which puckman is animated
 enum PUCKMAN_WAKA
 {
-    PUCKMAN_FULL = 0,
-    PUCKMAN_OPEN = 1,
-    PUCKMAN_WIDE = 2,
-    PUCKMAN_CLOSE = 3
+    PUCKMAN_WAKA_FULL = 0,
+    PUCKMAN_WAKA_OPEN = 1,
+    PUCKMAN_WAKA_WIDE = 2,
+    PUCKMAN_WAKA_CLOSING = 3
 };
 
 extern int puckman_load_sprite(const SDL_Renderer *renderer);
