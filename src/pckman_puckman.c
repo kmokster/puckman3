@@ -39,6 +39,8 @@ bool _puckmanDirectionIsChanged = false;
 int _puckmanWakaCount = 0;
 int _puckmanDeadCount = 0;
 
+/// @brief Load the x and y co-ordinates in SDL_Point
+/// structure to the top left of each animation frame
 void puckman_load_texturePoints()
 {
     // load the points that points to each frame for the waka sprite
@@ -107,32 +109,35 @@ end:
     return error_code;
 }
 
+/// @brief Call this function to free the texture held
 extern void puckman_free_sprite()
 {
     if (_puckmanAliveTexture != NULL)
+    {
         SDL_DestroyTexture(_puckmanAliveTexture);
+        _puckmanAliveTexture = NULL;
+    }
 
     if (_puckmanDeadTexture != NULL)
+    {
         SDL_DestroyTexture(_puckmanDeadTexture);
+        _puckmanDeadTexture = NULL;
+    }
 }
 
-extern void puckman_setHealthStatus(int status)
+extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame)
 {
-    _puckmanHealthState = status;
-}
-
-extern void puckman_setAliveStatus(int status)
-{
-    _puckmanAliveState = status;
-}
-
-extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame, const SDL_Rect *pos2Render)
-{
-    int error_code;
+    int error_code = 0;
     SDL_Rect sourceRect = {0,
                            0,
                            0,
                            0};
+
+    SDL_Rect destinationRect = {
+        pkm_game_getPuckmanLocation().x,
+        pkm_game_getPuckmanLocation().y,
+        PKM_MAIN_CHAR_WIDTH,
+        PKM_MAIN_CHAR_HEIGHT};
 
     if (renderer == NULL)
     {
@@ -155,16 +160,16 @@ extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame, 
                 sourceRect.w = PKM_PUCKMAN_WIDTH;
                 sourceRect.h = PKM_PUCKMAN_HEIGHT;
 
-                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
+                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
             }
             else if (pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_MOVING)
             {
                 sourceRect.x = (_puckmanWakaCount * PKM_PUCKMAN_WIDTH);
-                sourceRect.y = (_puckmanDirection * PKM_PUCKMAN_HEIGHT);
+                sourceRect.y = (pkm_game_getPuckmanDirection() * PKM_PUCKMAN_HEIGHT);
                 sourceRect.w = PKM_PUCKMAN_WIDTH;
                 sourceRect.h = PKM_PUCKMAN_HEIGHT;
 
-                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
+                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
 
                 if (nextFrame)
                 { // update the sequence
@@ -193,55 +198,11 @@ extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame, 
                 sourceRect.y = _puckmanAlivePoints[PUCKMAN_WAKA_OPEN][pkm_game_getPuckmanDirection()].y;
                 sourceRect.w = PKM_PUCKMAN_WIDTH;
                 sourceRect.h = PKM_PUCKMAN_HEIGHT;
-                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, pos2Render);
+                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
             }
         }
     }
 
 end:
     return error_code;
-}
-
-// TEMPORARY FUNCTIONS JUST TO TEST THE PASSING OF
-// STATES between thegame logic and puckman graphic functions
-
-extern void puckman_setDirection(int direction)
-{
-    switch (direction)
-    {
-    case PUCKMAN_DIRECTION_LEFT:
-        puckman_setDirectionLeft();
-        return;
-    case PUCKMAN_DIRECTION_RIGHT:
-        puckman_setDirectionRight();
-        return;
-    case PUCKMAN_DIRECTION_UP:
-        puckman_setDirectionUp();
-        return;
-    case PUCKMAN_DIRECTION_DOWN:
-        puckman_setDirectionDown();
-        return;
-    default:
-        return;
-    }
-}
-
-extern void puckman_setDirectionRight()
-{
-    _puckmanDirection = PUCKMAN_DIRECTION_RIGHT;
-}
-
-extern void puckman_setDirectionLeft()
-{
-    _puckmanDirection = PUCKMAN_DIRECTION_LEFT;
-}
-
-extern void puckman_setDirectionUp()
-{
-    _puckmanDirection = PUCKMAN_DIRECTION_UP;
-}
-
-extern void puckman_setDirectionDown()
-{
-    _puckmanDirection = PUCKMAN_DIRECTION_DOWN;
 }

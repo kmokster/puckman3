@@ -8,41 +8,46 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 // this is where the puckman is facing
-extern enum PUCKMAN_DIRECTION {
+typedef enum PKM_Direction
+{
     PUCKMAN_DIRECTION_RIGHT = 0, // puckman is moving right
     PUCKMAN_DIRECTION_LEFT = 1,  // puckman is moving left
     PUCKMAN_DIRECTION_UP = 2,    // puckman is moving up
     PUCKMAN_DIRECTION_DOWN = 3,  // puckman is moving down
     PUCKMAN_DIRECTION_NONE = 4
-};
+} PKM_Direction;
 
-extern enum PKM_PUCKMAN_HEALTH_STATE {
+typedef enum PKM_PuckmanHealthState
+{
     PUCKMAN_ALIVE, // puckman is alive but weak so ghost can kill em
     PUCKMAN_AGGRO, // puckman is now in aggro state and can eat ghost
     PUCKMAN_DEAD   // puckman is dead
-};
+} PKM_PuckmanHealthState;
 
-extern enum PKM_PUCKMAN_ALIVE_STATE {
+typedef enum PKM_PuckmanAliveState
+{
     PUCKMAN_ALIVE_START = 0,  // its at the start position
     PUCKMAN_ALIVE_MOVING = 1, // puckman is moving
     PUCKMAN_ALIVE_STOP = 2    // puckman is stopped
-};
+} PKM_PuckmanAliveState;
 
-extern enum PKM_GHOST_CHASE_DIRECTION {
+typedef enum PKM_GhostDirection
+{
     GHOST_DIRECTION_RIGHT = 0,
     GHOST_DIRECTOIN_LEFT = 1,
     GHOST_DIRECTION_UP = 2,
     GHOST_DIRECTION_DOWN = 3,
     GHOST_DIRECTION_NONE = 4
-};
+} PKM_GhostDirection;
 
-extern enum PKM_GHOST_STATE {
+typedef enum PKM_GhostState
+{
     GHOST_HOME,       // ghost is at home
     GHOST_CHASE,      // ghost is hunting puckman
     GHOST_SCATTER,    // ghost gives up the chase for a few seconds and return to their home corner
     GHOST_FRIGHTENED, // ghost is weak and running away from puckman
-    GHOST_EASTEN      // ghost is dead and going home to spawn
-};
+    GHOST_EATEN       // ghost is dead and going home to spawn
+} PKM_GhostState;
 
 extern enum PKM_MAIN_STATE {
     GAME_MAIN_MENU = 0,

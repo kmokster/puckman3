@@ -32,12 +32,9 @@ const int _mainGridColumns = PKM_MAIN_WIN_WIDTH / PKM_MAIN_CELL_WIDTH;
 // make the 60fps
 const float _mainFPS = 1000 / PKM_MAIN_FPS;
 
-/// @brief Initialize the SDL System, Create the window at the center of the screen and then get the renderer
-/// @return
-///         0 - if no error
-///        -1 - window creation error
-///        -2 - renderer creation error
-int initGame()
+/// @brief initialize SDL, windows and create texture etc.
+/// @return 0 if no error, non-zero if error
+int initSDL()
 {
     int error_code = 0;
 
@@ -101,10 +98,6 @@ int initGame()
         goto error;
     }
 
-    // TODO - 10/8
-    // move game init to the main game loop?
-    pkm_game_init(); // initialise the game structure
-
     goto end;
 
 error:
@@ -151,14 +144,147 @@ end:
     return error_code;
 }
 
-void unloadAssets()
+/// @brief Initialize the SDL System, Create the window at the center of the screen and then get the renderer
+/// @return
+///         0 - if no error
+///        -1 - window creation error
+///        -2 - renderer creation error
+int initGame()
 {
-    puckman_free_sprite();
+    int error_code = 0;
+
+    if ((error_code = initSDL()) != 0)
+    {
+        goto error;
+    }
+
+    // TODO - 10/8
+    // move game init to the main game loop?
+    pkm_game_init(); // initialise the game structure
+
+    error_code = loadAssets();
+    if (error_code != 0)
+    {
+        goto error;
+    }
+
+    goto end;
+
+error:
+    printf("main::initApp Error: %d\n", error_code);
+    return error_code;
+
+end:
+    SDL_Log("main::initApp Game Init successful!");
+    return 0;
 }
 
-void displayWindow()
+/// @brief this is the main game loop
+/// @return
+int startGame()
 {
-    SDL_ShowWindow(_mainWindow);
+    int error_code = 0;
+    bool quit_flag = false; // track if user hit quit button or close the window
+    SDL_Event e;            // track all events
+                            //    SDL_Rect puckmanRect;
+    float lastTick, nextTick, diffTick;
+    float wakaFrameCount = 0;
+    float puckmanMoveFrameCount = 0;
+
+    SDL_ShowWindow(_mainWindow); // display the hidden window
+
+    if (SDL_RenderClear(_mainRenderer) != 0) // clear screen
+    {
+        error_code = PKM_ERROR_MAIN_STARTGAME_RENCLR;
+        goto error;
+    }
+
+    drawGrid();                                  // for now draw the grid
+    puckman_alive_animate2(_mainRenderer, true); // draw puckman
+    SDL_RenderPresent(_mainRenderer);
+    lastTick = SDL_GetTicks();
+
+    while (quit_flag == false)
+    {
+        nextTick = (float)SDL_GetTicks();
+        diffTick = (float)(nextTick - lastTick);
+        if (diffTick >= _mainFPS) // going into FPS
+        {
+            // animate every 60fps
+            SDL_RenderClear(_mainRenderer); // clear the screen
+            drawGrid();                     // draw the grid for now
+
+            // TODO: MOVE THE WAKA COUNT TO PUCKMAN?
+            bool wakaRefresh = false;
+            if (wakaFrameCount == PKM_MAIN_WAKA_FRAME_COUNT)
+            {
+                // do the animation
+                wakaRefresh = true;
+                wakaFrameCount = 0;
+            }
+            else
+            {
+                wakaRefresh = false;
+                wakaFrameCount++;
+            }
+
+            // this section moves puckman base on the speed delta in wich puckman moves
+            if (puckmanMoveFrameCount >= PKM_MAIN_GAME_FRAME_COUNT)
+            {
+                // update the game first
+                pkm_game_updateGame();     // move puckman by the number of pixel
+                puckmanMoveFrameCount = 0; // reset the game frame count
+            }
+            else
+            {
+                puckmanMoveFrameCount = puckmanMoveFrameCount + (1 * pkm_game_getPuckmanSpeedDelta());
+            }
+
+            puckman_alive_animate2(_mainRenderer, wakaRefresh);
+            SDL_RenderPresent(_mainRenderer);
+
+            lastTick = SDL_GetTicks();
+        }
+        while (SDL_PollEvent(&e) != 0)
+        {
+            if (e.type == SDL_QUIT)
+            {
+                quit_flag = true;
+                SDL_Log("Program quit after %i ticks!\n", e.quit.timestamp);
+            }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                SDL_KeyCode keycode = e.key.keysym.sym;
+
+                if ((keycode == SDLK_a) || (keycode == SDLK_LEFT))
+                {
+                    SDL_Log("Puckman direction LEFT ->");
+                    pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_LEFT);
+                }
+                else if ((keycode == SDLK_d) || (keycode == SDLK_RIGHT))
+                {
+                    SDL_Log("Puckman direction RIGHT <-");
+                    pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_RIGHT);
+                }
+                else if ((keycode == SDLK_w) || (keycode == SDLK_UP))
+                {
+                    SDL_Log("Puckman direction UP ^");
+                    pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_UP);
+                }
+                else if ((keycode == SDLK_s) || (keycode == SDLK_DOWN))
+                {
+                    SDL_Log("Puckman direction DOWN v");
+                    pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_DOWN);
+                }
+            }
+        }
+    }
+    goto end;
+
+error:
+    return error_code;
+end:
+    return 0;
 }
 
 // draw the grid
@@ -191,8 +317,26 @@ void drawGrid()
     SDL_SetRenderDrawColor(_mainRenderer, u8r, u8g, u8b, u8a);
 }
 
-int quitGame()
+void unloadAssets()
 {
+    puckman_free_sprite();
+    // maze_free_sprite();
+    // blinky_free_sprite();
+    // inky_free_sprite();
+    // pinky_free_sprite();
+    // clyde_free_sprite();
+    // weakGhost_free_sprite();
+    // pallets_free_sprite();
+    // fruits_free_sprite():
+    // menu_free_sprite();
+
+    // pkm_font_free();
+    // pkm_audio_free();
+}
+
+void quitGame()
+{
+    unloadAssets();
 
     if (_mainTexture != NULL)
         SDL_DestroyTexture(_mainTexture);
@@ -213,157 +357,20 @@ int quitGame()
 int main(int argc, char *args[])
 {
     int error_code;
-    bool quit_flag = false; // track if user hit quit button or close the window
-    SDL_Event e;            // track all events
-    SDL_Rect puckmanRect;
-    float lastTick, nextTick, diffTick;
-    float wakaFrameCount = 0;
-    float puckmanMoveFrameCount = 0;
 
-    error_code = initGame(); // initialise SDL etc.
+    if ((error_code = initGame()) != 0) // initialise the application
+        goto error;
 
-    if (error_code == 0)
-    {
-        error_code = loadAssets(); // load all game assets.
+    if ((error_code = startGame()) != 0) // start the game loop
+        goto error;
 
-        /////////////// END OF CLEAN UP 13/8 ////////////////////
+    goto end;
 
-        if ((error_code == 0))
-        {
-            puckmanRect.x = pkm_game_getPuckmanLocation().x;
-            puckmanRect.y = pkm_game_getPuckmanLocation().y,
-            puckmanRect.w = PKM_MAIN_CHAR_WIDTH;  // 32px
-            puckmanRect.h = PKM_MAIN_CHAR_HEIGHT; // 32px
+error:
+    printf("Critical error in main loop with error code: %d \n", error_code);
+    return error_code;
 
-            displayWindow();
-            // clear the renderer
-            SDL_RenderClear(_mainRenderer);
-            drawGrid();
-
-            puckman_alive_animate2(_mainRenderer, true, &puckmanRect);
-
-            SDL_RenderPresent(_mainRenderer);
-            lastTick = SDL_GetTicks();
-
-            while (quit_flag == false)
-            {
-                nextTick = (float)SDL_GetTicks();
-                diffTick = (float)(nextTick - lastTick);
-
-                // TODO
-                // A redesign of the animation sequence needs to be done
-                // the speed of both the waka and the movement has to be brought down
-                // so better to test both movement and waka speed to see if it hits
-                // if so then go into the clear screen and figure out if this is a
-                // waka or a move
-                //
-                // there is a possibility that the waka maybe slower than the move
-
-                if (diffTick >= _mainFPS) // going into FPS
-                {
-                    // animate
-                    SDL_RenderClear(_mainRenderer); // clear the screen
-                    drawGrid();                     // draw the grid for now
-
-                    bool wakaRefresh = false;
-                    if (wakaFrameCount == PKM_MAIN_WAKA_FRAME_COUNT)
-                    {
-                        // do the animation
-                        wakaRefresh = true;
-                        wakaFrameCount = 0;
-                    }
-                    else
-                    {
-                        wakaRefresh = false;
-                        wakaFrameCount++;
-                    }
-
-                    // this section moves puckman base on the speed delta in wich puckman moves
-                    if (puckmanMoveFrameCount >= PKM_MAIN_GAME_FRAME_COUNT)
-                    {
-                        // update the game first
-                        pkm_game_updateGame(); // move puckman by the number of pixel
-                        puckmanRect.x = pkm_game_getPuckmanLocation().x;
-                        puckmanRect.y = pkm_game_getPuckmanLocation().y,
-                        puckmanRect.w = PKM_MAIN_CHAR_WIDTH;  // 32px
-                        puckmanRect.h = PKM_MAIN_CHAR_HEIGHT; // 32px
-
-                        // SDL_Log("PuckmanRect.x is %d", puckmanRect.x);
-                        // SDL_Log("PuckmanRect.y is %d", puckmanRect.y);
-
-                        puckmanMoveFrameCount = 0; // reset the game frame count
-                    }
-                    else
-                    {
-                        puckmanMoveFrameCount = puckmanMoveFrameCount + (1 * pkm_game_getPuckmanSpeedDelta());
-                    }
-
-                    puckman_alive_animate2(_mainRenderer, wakaRefresh, &puckmanRect);
-                    // puckman_animate(_mainRenderer, &pkm_game_getPuckmanStructure);
-                    SDL_RenderPresent(_mainRenderer);
-
-                    lastTick = SDL_GetTicks();
-                }
-                while (SDL_PollEvent(&e) != 0)
-                {
-                    if (e.type == SDL_QUIT)
-                    {
-                        quit_flag = true;
-                        SDL_Log("Program quit after %i ticks!\n", e.quit.timestamp);
-                    }
-                    else if (e.type == SDL_KEYDOWN)
-                    {
-                        SDL_KeyCode keycode = e.key.keysym.sym;
-
-                        if ((keycode == SDLK_a) || (keycode == SDLK_LEFT))
-                        {
-                            SDL_Log("Puckman direction LEFT ->");
-                            // NOTE:
-                            // we let the pckman_game determine if it is possible to set a direction
-                            // so it checks for correctness or collision etc.
-                            // then we pass the result to pckman_puckman to render
-                            pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_LEFT);
-                            puckman_setDirection(pkm_game_getPuckmanDirection());
-                            puckman_setHealthStatus(pkm_game_getPuckmanHealthStatus());
-                            puckman_setAliveStatus(pkm_game_getPuckmanAliveStatus());
-                        }
-                        else if ((keycode == SDLK_d) || (keycode == SDLK_RIGHT))
-                        {
-                            SDL_Log("Puckman direction RIGHT <-");
-                            pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_RIGHT);
-                            puckman_setDirection(pkm_game_getPuckmanDirection());
-                            puckman_setHealthStatus(pkm_game_getPuckmanHealthStatus());
-                            puckman_setAliveStatus(pkm_game_getPuckmanAliveStatus());
-                        }
-                        else if ((keycode == SDLK_w) || (keycode == SDLK_UP))
-                        {
-                            SDL_Log("Puckman direction UP ^");
-                            pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_UP);
-                            puckman_setDirection(pkm_game_getPuckmanDirection());
-                            puckman_setHealthStatus(pkm_game_getPuckmanHealthStatus());
-                            puckman_setAliveStatus(pkm_game_getPuckmanAliveStatus());
-                        }
-                        else if ((keycode == SDLK_s) || (keycode == SDLK_DOWN))
-                        {
-                            SDL_Log("Puckman direction DOWN v");
-                            pkm_game_setPuckmanDirection(PUCKMAN_DIRECTION_DOWN);
-                            puckman_setDirection(pkm_game_getPuckmanDirection());
-                            puckman_setHealthStatus(pkm_game_getPuckmanHealthStatus());
-                            puckman_setAliveStatus(pkm_game_getPuckmanAliveStatus());
-                        }
-                    }
-                }
-            }
-
-            unloadAssets();
-        }
-    }
-    else
-    {
-        printf("ERORR in initialisation\n");
-    }
-
+end:
     quitGame();
-
     return 0;
 }

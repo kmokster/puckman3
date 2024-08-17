@@ -18,12 +18,12 @@
 /// @brief structure to track puckman
 typedef struct puckman_character_structure
 {
-    SDL_Point current_location; // set the location of puckman
-    SDL_Point last_location;    // the last location for more efficient render processing
-    int health_status;          // tracks the health of puckman
-    int alive_status;           // tracks the status while puckman is still alive
-    int direction;              // tracks the current direction of puckman
-    float speed_delta;          // current puckman speed base on game level
+    SDL_Point current_location;           // set the location of puckman
+    SDL_Point last_location;              // the last location for more efficient render processing
+    PKM_PuckmanHealthState health_status; // tracks the health of puckman
+    PKM_PuckmanAliveState alive_status;   // tracks the status while puckman is still alive
+    PKM_Direction direction;              // tracks the current direction of puckman
+    float speed_delta;                    // current puckman speed base on game level
 } _puckmanStatus;
 
 // use to track the status and location of the ghost
@@ -31,16 +31,17 @@ typedef struct ghost_character_structure
 {
     SDL_Point current_location;
     SDL_Point last_location;
-    SDL_Point target_location; // the target tile to move to
-    int current_status;        // home, chase, scatter, frightened or spawning
-    int direction;
+    SDL_Point target_location;     // the target tile to move to
+    PKM_GhostState current_status; // home, chase, scatter, frightened or spawning
+    PKM_GhostDirection direction;
     float speed_delta;
 } _ghostStatus;
 
-struct puckman_game_structure
+typedef struct puckman_game_structure
 {
     Uint32 high_score;
     Uint32 current_score;
+    Uint32 current_level;
 
     // maze data store
     //  pallet data store
@@ -53,16 +54,20 @@ struct puckman_game_structure
     // struct for fruits
 
     // int puckman_direction;
-} _pkm_game;
+} puckman_game_structure;
 
 // TODO: declare as static?
 // here is where we track all the life time variables
 int _gameHiScore = 0; // track the games hi score
+puckman_game_structure _pkm_game;
 
 void pkm_game_reset()
 {
     // reset the current score to 0
     _pkm_game.current_score = 0;
+
+    // reset the current level to 0
+    _pkm_game.current_level = 0;
 
     // setup the puckman health
     _pkm_game.puckman.health_status = PUCKMAN_ALIVE;
@@ -86,7 +91,29 @@ void pkm_game_reset()
 extern void pkm_game_init()
 {
     _pkm_game.high_score = _gameHiScore;
-    pkm_game_reset();
+    // reset the current score to 0
+    _pkm_game.current_score = 0;
+
+    // reset the current level to 0
+    _pkm_game.current_level = 0;
+
+    // setup the puckman health
+    _pkm_game.puckman.health_status = PUCKMAN_ALIVE;
+    _pkm_game.puckman.alive_status = PUCKMAN_ALIVE_START;
+    _pkm_game.puckman.direction = PUCKMAN_DIRECTION_NONE;
+    _pkm_game.puckman.speed_delta = 1.0;
+
+    // initialize the puckman starting position
+    // for now at the center of the screen
+    _pkm_game.puckman.current_location.x = (PKM_MAIN_WIN_WIDTH - PKM_MAIN_CHAR_WIDTH) / 2;
+    _pkm_game.puckman.current_location.y = (PKM_MAIN_WIN_HEIGHT - PKM_MAIN_CHAR_HEIGHT) / 2;
+    _pkm_game.puckman.last_location.x = _pkm_game.puckman.current_location.x;
+    _pkm_game.puckman.last_location.y = _pkm_game.puckman.current_location.y;
+
+    SDL_Log("x location for puckman is: %d", _pkm_game.puckman.current_location.x);
+    SDL_Log("y location for puckman is: %d", _pkm_game.puckman.current_location.y);
+
+    // loadMazeMap();
 }
 
 extern void pkm_game_quit()

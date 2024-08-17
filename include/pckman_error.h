@@ -26,6 +26,8 @@
 #define PKM_ERROR_MAIN_INIT_SDL_REND 1010104 // SDL error when calling SDL_CreateRenderer
 #define PKM_ERROR_MAIN_INIT_SDL_TEXT 1010105 // SDL error when calling SDL_CreateTexture
 
+#define PKM_ERROR_MAIN_STARTGAME_RENCLR 1010301 // SDL error when calling SDL_RenderClear
+
 //////////////////////////////////////////////////////////////////////////////////////////
 // Errors pertaining to functions in the puckman file
 // Error_code format is: 1030XXYY
