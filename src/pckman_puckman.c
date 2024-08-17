@@ -125,7 +125,7 @@ extern void puckman_free_sprite()
     }
 }
 
-extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame)
+extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool wakaNextFrame)
 {
     int error_code = 0;
     SDL_Rect sourceRect = {0,
@@ -141,68 +141,74 @@ extern int puckman_alive_animate2(const SDL_Renderer *renderer, bool nextFrame)
 
     if (renderer == NULL)
     {
-        error_code = 2005;
+        error_code = PKM_ERROR_PUCKMAN_ANIMATE_RENDNULL;
         goto end;
     }
-    else
+
+    // render the current state of puckman to the pos2Render
+
+    // TODO: check the current state of Puckman (Alive or Dead?)
+    // when puckman is alive and is moving
+    if (pkm_game_getPuckmanHealthStatus() == PUCKMAN_ALIVE)
     {
-        // render the current state of puckman to the pos2Render
-
-        // TODO: check the current state of Puckman (Alive or Dead?)
-        // when puckman is alive and is moving
-        if (pkm_game_getPuckmanHealthStatus() == PUCKMAN_ALIVE)
+        if (pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_START) // the game has just started
         {
-            if (pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_START) // the game has just started
-            {
-                // map it to the first frame in the puckman sprite
-                sourceRect.x = _puckmanAlivePoints[0][0].x;
-                sourceRect.y = _puckmanAlivePoints[0][0].y;
-                sourceRect.w = PKM_PUCKMAN_WIDTH;
-                sourceRect.h = PKM_PUCKMAN_HEIGHT;
+            // map it to the first frame in the puckman sprite
+            sourceRect.x = _puckmanAlivePoints[0][0].x;
+            sourceRect.y = _puckmanAlivePoints[0][0].y;
+            sourceRect.w = PKM_PUCKMAN_WIDTH;
+            sourceRect.h = PKM_PUCKMAN_HEIGHT;
 
-                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
-            }
-            else if (pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_MOVING)
-            {
-                sourceRect.x = (_puckmanWakaCount * PKM_PUCKMAN_WIDTH);
-                sourceRect.y = (pkm_game_getPuckmanDirection() * PKM_PUCKMAN_HEIGHT);
-                sourceRect.w = PKM_PUCKMAN_WIDTH;
-                sourceRect.h = PKM_PUCKMAN_HEIGHT;
+            error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
+        }
+        else if (pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_MOVING)
+        {
+            sourceRect.x = (_puckmanWakaCount * PKM_PUCKMAN_WIDTH);
+            sourceRect.y = (pkm_game_getPuckmanDirection() * PKM_PUCKMAN_HEIGHT);
+            sourceRect.w = PKM_PUCKMAN_WIDTH;
+            sourceRect.h = PKM_PUCKMAN_HEIGHT;
 
-                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
+            error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
 
-                if (nextFrame)
-                { // update the sequence
-                    switch (_puckmanWakaCount)
-                    {
-                    case PUCKMAN_WAKA_FULL:
-                        _puckmanWakaCount++; // update the next animation to mouth open
-                        break;
-                    case PUCKMAN_WAKA_OPEN:
-                        _puckmanWakaCount++; // update the next animation to mouth wide
-                        break;
-                    case PUCKMAN_WAKA_WIDE:
-                        _puckmanWakaCount++; // update the next animation to mouth closing
-                        break;
-                    case PUCKMAN_WAKA_CLOSING:
-                        _puckmanWakaCount = 0; // update the next animation to fully closed
-                        break;
-                    default:
-                        break;
-                    }
+            if (wakaNextFrame)
+            { // update the sequence
+                switch (_puckmanWakaCount)
+                {
+                case PUCKMAN_WAKA_FULL:
+                    _puckmanWakaCount++; // update the next animation to mouth open
+                    break;
+                case PUCKMAN_WAKA_OPEN:
+                    _puckmanWakaCount++; // update the next animation to mouth wide
+                    break;
+                case PUCKMAN_WAKA_WIDE:
+                    _puckmanWakaCount++; // update the next animation to mouth closing
+                    break;
+                case PUCKMAN_WAKA_CLOSING:
+                    _puckmanWakaCount = 0; // update the next animation to fully closed
+                    break;
+                default:
+                    break;
                 }
             }
-            else if ((pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_STOP))
-            {
-                sourceRect.x = _puckmanAlivePoints[PUCKMAN_WAKA_OPEN][pkm_game_getPuckmanDirection()].x;
-                sourceRect.y = _puckmanAlivePoints[PUCKMAN_WAKA_OPEN][pkm_game_getPuckmanDirection()].y;
-                sourceRect.w = PKM_PUCKMAN_WIDTH;
-                sourceRect.h = PKM_PUCKMAN_HEIGHT;
-                error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
-            }
+        }
+        else if ((pkm_game_getPuckmanAliveStatus() == PUCKMAN_ALIVE_STOP))
+        {
+            sourceRect.x = _puckmanAlivePoints[PUCKMAN_WAKA_OPEN][pkm_game_getPuckmanDirection()].x;
+            sourceRect.y = _puckmanAlivePoints[PUCKMAN_WAKA_OPEN][pkm_game_getPuckmanDirection()].y;
+            sourceRect.w = PKM_PUCKMAN_WIDTH;
+            sourceRect.h = PKM_PUCKMAN_HEIGHT;
+            error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
         }
     }
 
-end:
+    if (error_code == 0)
+    {
+        goto end;
+    }
+
+error:
     return error_code;
+
+end:
+    return 0;
 }

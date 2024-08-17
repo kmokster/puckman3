@@ -40,6 +40,7 @@
 #define PKM_ERROR_PUCKMAN_DEAD_BMPNOTFOUND 1030106    // puckman dying bmp not found
 #define PKM_ERORR_PUCKMAN_DEADSURACE_NOLOAD 1030107   // puckman dying bmp unable to load surface
 #define PKM_ERROR_PUCKMAN_DEADSURFACE_NOTEXT 1030108  // puckman dying texture unable to create
+#define PKM_ERROR_PUCKMAN_ANIMATE_RENDNULL 1030201    // renderer was pass null into animate
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Errors pertaining to functions in the utility file
