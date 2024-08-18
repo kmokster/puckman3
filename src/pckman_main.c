@@ -17,6 +17,7 @@
 #include "pckman_puckman.h"
 #include "pckman_game.h"
 #include "pckman_error.h"
+#include "pckman_audio.h"
 
 // define all the main components
 const SDL_Window *_mainWindow = NULL;
@@ -115,9 +116,10 @@ int loadAssets()
 {
     int error_code = 0;
 
-    error_code = puckman_load_sprite(_mainRenderer);
+    if ((error_code = puckman_load_sprite(_mainRenderer)) != 0)
+        goto error;
 
-    if (error_code != 0)
+    if ((error_code = pkm_audio_load()) != 0)
         goto error;
 
     // pkm_maze_loadSprite();
@@ -154,6 +156,11 @@ int initGame()
     int error_code = 0;
 
     if ((error_code = initSDL()) != 0)
+    {
+        goto error;
+    }
+
+    if ((error_code = pkm_audio_init()) != 0)
     {
         goto error;
     }
@@ -199,9 +206,12 @@ int startGame()
         goto error;
     }
 
-    drawGrid();                                  // for now draw the grid
-    puckman_alive_animate2(_mainRenderer, true); // draw puckman
+    drawGrid();                                 // for now draw the grid
+    puckman_alive_animate(_mainRenderer, true); // draw puckman
     SDL_RenderPresent(_mainRenderer);
+
+    pkm_audio_playBackgroundMusic();
+
     lastTick = SDL_GetTicks();
 
     while (quit_flag == false)
@@ -240,7 +250,7 @@ int startGame()
                 puckmanMoveFrameCount = puckmanMoveFrameCount + (1 * pkm_game_getPuckmanSpeedDelta());
             }
 
-            puckman_alive_animate2(_mainRenderer, wakaRefresh);
+            puckman_alive_animate(_mainRenderer, wakaRefresh);
             SDL_RenderPresent(_mainRenderer);
 
             lastTick = SDL_GetTicks();
@@ -279,6 +289,7 @@ int startGame()
             }
         }
     }
+    pkm_audio_haltBackgroundMusic();
     goto end;
 
 error:
@@ -320,6 +331,7 @@ void drawGrid()
 void unloadAssets()
 {
     puckman_free_sprite();
+    pkm_audio_unload();
     // maze_free_sprite();
     // blinky_free_sprite();
     // inky_free_sprite();

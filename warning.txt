@@ -1,0 +1,310 @@
+In file included from D:/project/retro/puckman3\src\pckman_main.c:16:
+D:/project/retro/puckman3\include/pckman_state.h:56:1: warning: useless storage class specifier in empty declaration
+   56 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:62:1: warning: useless storage class specifier in empty declaration
+   62 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:71:1: warning: useless storage class specifier in empty declaration
+   71 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:76:1: warning: useless storage class specifier in empty declaration
+   76 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:81:1: warning: useless storage class specifier in empty declaration
+   81 | };
+      | ^
+In file included from D:/project/retro/puckman3\src\pckman_main.c:18:
+D:/project/retro/puckman3\include/pckman_game.h:18: warning: "PKM_MAIN_HEADER" redefined
+   18 | #define PKM_MAIN_HEADER HEIGHT 64
+      | 
+D:/project/retro/puckman3\include/pckman_game.h:17: note: this is the location of the previous definition
+   17 | #define PKM_MAIN_HEADER WIDTH 448
+      | 
+D:/project/retro/puckman3\include/pckman_game.h:22: warning: "PKM_MAIN_FOOTER" redefined
+   22 | #define PKM_MAIN_FOOTER HEIGHT 64
+      | 
+D:/project/retro/puckman3\include/pckman_game.h:21: note: this is the location of the previous definition
+   21 | #define PKM_MAIN_FOOTER WIDTH 448
+      | 
+D:/project/retro/puckman3\src\pckman_main.c: In function 'initSDL':
+D:/project/retro/puckman3\src\pckman_main.c:51:5: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+   51 |     sprintf(gameTitle, "%s version %s.%s", PKM_MAIN_APPNAME, PKM_MAIN_MAJOR, PKM_MAIN_MINOR);
+      |     ^~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:21:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   20 | #include "pckman_audio.h"
+  +++ |+#include <stdio.h>
+   21 | 
+D:/project/retro/puckman3\src\pckman_main.c:51:5: warning: incompatible implicit declaration of built-in function 'sprintf' [-Wbuiltin-declaration-mismatch]
+   51 |     sprintf(gameTitle, "%s version %s.%s", PKM_MAIN_APPNAME, PKM_MAIN_MAJOR, PKM_MAIN_MINOR);
+      |     ^~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:51:5: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+D:/project/retro/puckman3\src\pckman_main.c:82:40: warning: passing argument 1 of 'SDL_CreateRenderer' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+   82 |     _mainRenderer = SDL_CreateRenderer(_mainWindow, 0, SDL_RENDERER_ACCELERATED);
+      |                                        ^~~~~~~~~~~
+In file included from C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL.h:55,
+                 from D:/project/retro/puckman3\src\pckman_main.c:12:
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:227:72: note: expected 'SDL_Window *' but argument is of type 'const SDL_Window *'
+  227 | extern DECLSPEC SDL_Renderer * SDLCALL SDL_CreateRenderer(SDL_Window * window,
+      |                                                           ~~~~~~~~~~~~~^~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:91:38: warning: passing argument 1 of 'SDL_CreateTexture' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+   91 |     _mainTexture = SDL_CreateTexture(_mainRenderer,
+      |                                      ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:333:72: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+  333 | extern DECLSPEC SDL_Texture * SDLCALL SDL_CreateTexture(SDL_Renderer * renderer,
+      |                                                         ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c: In function 'initGame':
+D:/project/retro/puckman3\src\pckman_main.c:181:5: warning: implicit declaration of function 'printf' [-Wimplicit-function-declaration]
+  181 |     printf("main::initApp Error: %d\n", error_code);
+      |     ^~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:181:5: note: include '<stdio.h>' or provide a declaration of 'printf'
+D:/project/retro/puckman3\src\pckman_main.c:181:5: warning: incompatible implicit declaration of built-in function 'printf' [-Wbuiltin-declaration-mismatch]
+D:/project/retro/puckman3\src\pckman_main.c:181:5: note: include '<stdio.h>' or provide a declaration of 'printf'
+D:/project/retro/puckman3\src\pckman_main.c: In function 'startGame':
+D:/project/retro/puckman3\src\pckman_main.c:201:20: warning: passing argument 1 of 'SDL_ShowWindow' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  201 |     SDL_ShowWindow(_mainWindow); // display the hidden window
+      |                    ^~~~~~~~~~~
+In file included from C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_events.h:33,
+                 from C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL.h:41:
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_video.h:1200:58: note: expected 'SDL_Window *' but argument is of type 'const SDL_Window *'
+ 1200 | extern DECLSPEC void SDLCALL SDL_ShowWindow(SDL_Window * window);
+      |                                             ~~~~~~~~~~~~~^~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:203:25: warning: passing argument 1 of 'SDL_RenderClear' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  203 |     if (SDL_RenderClear(_mainRenderer) != 0) // clear screen
+      |                         ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1160:60: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1160 | extern DECLSPEC int SDLCALL SDL_RenderClear(SDL_Renderer * renderer);
+      |                                             ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:209:5: warning: implicit declaration of function 'drawGrid' [-Wimplicit-function-declaration]
+  209 |     drawGrid();                                 // for now draw the grid
+      |     ^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:211:23: warning: passing argument 1 of 'SDL_RenderPresent' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  211 |     SDL_RenderPresent(_mainRenderer);
+      |                       ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1753:63: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1753 | extern DECLSPEC void SDLCALL SDL_RenderPresent(SDL_Renderer * renderer);
+      |                                                ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:224:29: warning: passing argument 1 of 'SDL_RenderClear' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  224 |             SDL_RenderClear(_mainRenderer); // clear the screen
+      |                             ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1160:60: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1160 | extern DECLSPEC int SDLCALL SDL_RenderClear(SDL_Renderer * renderer);
+      |                                             ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:254:31: warning: passing argument 1 of 'SDL_RenderPresent' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  254 |             SDL_RenderPresent(_mainRenderer);
+      |                               ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1753:63: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1753 | extern DECLSPEC void SDLCALL SDL_RenderPresent(SDL_Renderer * renderer);
+      |                                                ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c: At top level:
+D:/project/retro/puckman3\src\pckman_main.c:302:6: warning: conflicting types for 'drawGrid'; have 'void()'
+  302 | void drawGrid()
+      |      ^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:209:5: note: previous implicit declaration of 'drawGrid' with type 'void()'
+  209 |     drawGrid();                                 // for now draw the grid
+      |     ^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c: In function 'drawGrid':
+D:/project/retro/puckman3\src\pckman_main.c:306:28: warning: passing argument 1 of 'SDL_GetRenderDrawColor' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  306 |     SDL_GetRenderDrawColor(_mainRenderer, &u8r, &u8g, &u8b, &u8a);
+      |                            ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1102:67: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1102 | extern DECLSPEC int SDLCALL SDL_GetRenderDrawColor(SDL_Renderer * renderer,
+      |                                                    ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:307:32: warning: passing argument 1 of 'SDL_SetRenderDrawBlendMode' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  307 |     SDL_SetRenderDrawBlendMode(_mainRenderer, SDL_BLENDMODE_BLEND); // new blend mode for alpha
+      |                                ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1128:71: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1128 | extern DECLSPEC int SDLCALL SDL_SetRenderDrawBlendMode(SDL_Renderer * renderer,
+      |                                                        ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:308:28: warning: passing argument 1 of 'SDL_SetRenderDrawColor' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  308 |     SDL_SetRenderDrawColor(_mainRenderer,
+      |                            ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1079:67: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1079 | extern DECLSPEC int SDLCALL SDL_SetRenderDrawColor(SDL_Renderer * renderer,
+      |                                                    ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:317:28: warning: passing argument 1 of 'SDL_RenderDrawLine' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  317 |         SDL_RenderDrawLine(_mainRenderer, 0, row, PKM_MAIN_WIN_WIDTH, row);
+      |                            ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1244:63: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1244 | extern DECLSPEC int SDLCALL SDL_RenderDrawLine(SDL_Renderer * renderer,
+      |                                                ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:323:28: warning: passing argument 1 of 'SDL_RenderDrawLine' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  323 |         SDL_RenderDrawLine(_mainRenderer, column, 0, column, PKM_MAIN_WIN_HEIGHT);
+      |                            ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1244:63: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1244 | extern DECLSPEC int SDLCALL SDL_RenderDrawLine(SDL_Renderer * renderer,
+      |                                                ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:326:32: warning: passing argument 1 of 'SDL_SetRenderDrawBlendMode' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  326 |     SDL_SetRenderDrawBlendMode(_mainRenderer, SDL_BLENDMODE_NONE);
+      |                                ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1128:71: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1128 | extern DECLSPEC int SDLCALL SDL_SetRenderDrawBlendMode(SDL_Renderer * renderer,
+      |                                                        ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:328:28: warning: passing argument 1 of 'SDL_SetRenderDrawColor' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  328 |     SDL_SetRenderDrawColor(_mainRenderer, u8r, u8g, u8b, u8a);
+      |                            ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1079:67: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1079 | extern DECLSPEC int SDLCALL SDL_SetRenderDrawColor(SDL_Renderer * renderer,
+      |                                                    ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c: In function 'quitGame':
+D:/project/retro/puckman3\src\pckman_main.c:357:29: warning: passing argument 1 of 'SDL_DestroyRenderer' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  357 |         SDL_DestroyRenderer(_mainRenderer);
+      |                             ^~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1782:65: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1782 | extern DECLSPEC void SDLCALL SDL_DestroyRenderer(SDL_Renderer * renderer);
+      |                                                  ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:360:27: warning: passing argument 1 of 'SDL_DestroyWindow' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  360 |         SDL_DestroyWindow(_mainWindow);
+      |                           ^~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_video.h:1805:61: note: expected 'SDL_Window *' but argument is of type 'const SDL_Window *'
+ 1805 | extern DECLSPEC void SDLCALL SDL_DestroyWindow(SDL_Window * window);
+      |                                                ~~~~~~~~~~~~~^~~~~~
+D:/project/retro/puckman3\src\pckman_main.c: In function 'SDL_main':
+D:/project/retro/puckman3\src\pckman_main.c:382:5: warning: incompatible implicit declaration of built-in function 'printf' [-Wbuiltin-declaration-mismatch]
+  382 |     printf("Critical error in main loop with error code: %d \n", error_code);
+      |     ^~~~~~
+D:/project/retro/puckman3\src\pckman_main.c:382:5: note: include '<stdio.h>' or provide a declaration of 'printf'
+D:/project/retro/puckman3\src\pckman_utils.c: In function 'pkm_utils_loadTextureWithColorKey':
+D:/project/retro/puckman3\src\pckman_utils.c:52:32: warning: passing argument 1 of 'pkm_util_isFileExists' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+   52 |     if (!pkm_util_isFileExists(filename))
+      |                                ^~~~~~~~
+D:/project/retro/puckman3\src\pckman_utils.c:18:41: note: expected 'char *' but argument is of type 'const char *'
+   18 | extern bool pkm_util_isFileExists(char *filename)
+      |                                   ~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_utils.c:75:45: warning: passing argument 1 of 'SDL_CreateTextureFromSurface' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+   75 |     *texture = SDL_CreateTextureFromSurface(renderer, surface); // deep copy
+      |                                             ^~~~~~~~
+In file included from C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL.h:55,
+                 from D:/project/retro/puckman3\include/pckman_utils.h:5,
+                 from D:/project/retro/puckman3\src\pckman_utils.c:12:
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:362:83: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+  362 | extern DECLSPEC SDL_Texture * SDLCALL SDL_CreateTextureFromSurface(SDL_Renderer * renderer, SDL_Surface * surface);
+      |                                                                    ~~~~~~~~~~~~~~~^~~~~~~~
+In file included from D:/project/retro/puckman3\src\pckman_puckman.c:20:
+D:/project/retro/puckman3\include/pckman_game.h:18: warning: "PKM_MAIN_HEADER" redefined
+   18 | #define PKM_MAIN_HEADER HEIGHT 64
+      | 
+D:/project/retro/puckman3\include/pckman_game.h:17: note: this is the location of the previous definition
+   17 | #define PKM_MAIN_HEADER WIDTH 448
+      | 
+D:/project/retro/puckman3\include/pckman_game.h:22: warning: "PKM_MAIN_FOOTER" redefined
+   22 | #define PKM_MAIN_FOOTER HEIGHT 64
+      | 
+D:/project/retro/puckman3\include/pckman_game.h:21: note: this is the location of the previous definition
+   21 | #define PKM_MAIN_FOOTER WIDTH 448
+      | 
+In file included from D:/project/retro/puckman3\src\pckman_puckman.c:22:
+D:/project/retro/puckman3\include/pckman_state.h:56:1: warning: useless storage class specifier in empty declaration
+   56 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:62:1: warning: useless storage class specifier in empty declaration
+   62 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:71:1: warning: useless storage class specifier in empty declaration
+   71 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:76:1: warning: useless storage class specifier in empty declaration
+   76 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:81:1: warning: useless storage class specifier in empty declaration
+   81 | };
+      | ^
+D:/project/retro/puckman3\src\pckman_puckman.c: In function 'puckman_load_sprite':
+D:/project/retro/puckman3\src\pckman_puckman.c:81:52: warning: passing argument 4 of 'pkm_utils_loadTextureWithColorKey' from incompatible pointer type [-Wincompatible-pointer-types]
+   81 |                                                    &_puckmanAliveTexture);
+      |                                                    ^~~~~~~~~~~~~~~~~~~~~
+      |                                                    |
+      |                                                    const SDL_Texture **
+In file included from D:/project/retro/puckman3\src\pckman_puckman.c:24:
+D:/project/retro/puckman3\include/pckman_utils.h:15:135: note: expected 'SDL_Texture **' but argument is of type 'const SDL_Texture **'
+   15 | extern int pkm_utils_loadTextureWithColorKey(const char *filename, const SDL_Renderer *renderer, const Uint32 colorkey, SDL_Texture **texture);
+      |                                                                                                                         ~~~~~~~~~~~~~~^~~~~~~
+D:/project/retro/puckman3\src\pckman_puckman.c:91:52: warning: passing argument 4 of 'pkm_utils_loadTextureWithColorKey' from incompatible pointer type [-Wincompatible-pointer-types]
+   91 |                                                    &_puckmanDeadTexture);
+      |                                                    ^~~~~~~~~~~~~~~~~~~~
+      |                                                    |
+      |                                                    const SDL_Texture **
+D:/project/retro/puckman3\include/pckman_utils.h:15:135: note: expected 'SDL_Texture **' but argument is of type 'const SDL_Texture **'
+   15 | extern int pkm_utils_loadTextureWithColorKey(const char *filename, const SDL_Renderer *renderer, const Uint32 colorkey, SDL_Texture **texture);
+      |                                                                                                                         ~~~~~~~~~~~~~~^~~~~~~
+D:/project/retro/puckman3\src\pckman_puckman.c: In function 'puckman_free_sprite':
+D:/project/retro/puckman3\src\pckman_puckman.c:117:28: warning: passing argument 1 of 'SDL_DestroyTexture' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  117 |         SDL_DestroyTexture(_puckmanAliveTexture);
+      |                            ^~~~~~~~~~~~~~~~~~~~
+In file included from C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL.h:55,
+                 from D:/project/retro/puckman3\include/pckman_game.h:12:
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1768:63: note: expected 'SDL_Texture *' but argument is of type 'const SDL_Texture *'
+ 1768 | extern DECLSPEC void SDLCALL SDL_DestroyTexture(SDL_Texture * texture);
+      |                                                 ~~~~~~~~~~~~~~^~~~~~~
+D:/project/retro/puckman3\src\pckman_puckman.c:123:28: warning: passing argument 1 of 'SDL_DestroyTexture' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  123 |         SDL_DestroyTexture(_puckmanDeadTexture);
+      |                            ^~~~~~~~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1768:63: note: expected 'SDL_Texture *' but argument is of type 'const SDL_Texture *'
+ 1768 | extern DECLSPEC void SDLCALL SDL_DestroyTexture(SDL_Texture * texture);
+      |                                                 ~~~~~~~~~~~~~~^~~~~~~
+D:/project/retro/puckman3\src\pckman_puckman.c: In function 'puckman_alive_animate':
+D:/project/retro/puckman3\src\pckman_puckman.c:162:41: warning: passing argument 1 of 'SDL_RenderCopy' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  162 |             error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
+      |                                         ^~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1409:59: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1409 | extern DECLSPEC int SDLCALL SDL_RenderCopy(SDL_Renderer * renderer,
+      |                                            ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_puckman.c:162:51: warning: passing argument 2 of 'SDL_RenderCopy' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  162 |             error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
+      |                                                   ^~~~~~~~~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1410:58: note: expected 'SDL_Texture *' but argument is of type 'const SDL_Texture *'
+ 1410 |                                            SDL_Texture * texture,
+      |                                            ~~~~~~~~~~~~~~^~~~~~~
+D:/project/retro/puckman3\src\pckman_puckman.c:171:41: warning: passing argument 1 of 'SDL_RenderCopy' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  171 |             error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
+      |                                         ^~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1409:59: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1409 | extern DECLSPEC int SDLCALL SDL_RenderCopy(SDL_Renderer * renderer,
+      |                                            ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_puckman.c:171:51: warning: passing argument 2 of 'SDL_RenderCopy' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  171 |             error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
+      |                                                   ^~~~~~~~~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1410:58: note: expected 'SDL_Texture *' but argument is of type 'const SDL_Texture *'
+ 1410 |                                            SDL_Texture * texture,
+      |                                            ~~~~~~~~~~~~~~^~~~~~~
+D:/project/retro/puckman3\src\pckman_puckman.c:200:41: warning: passing argument 1 of 'SDL_RenderCopy' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  200 |             error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
+      |                                         ^~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1409:59: note: expected 'SDL_Renderer *' but argument is of type 'const SDL_Renderer *'
+ 1409 | extern DECLSPEC int SDLCALL SDL_RenderCopy(SDL_Renderer * renderer,
+      |                                            ~~~~~~~~~~~~~~~^~~~~~~~
+D:/project/retro/puckman3\src\pckman_puckman.c:200:51: warning: passing argument 2 of 'SDL_RenderCopy' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  200 |             error_code = SDL_RenderCopy(renderer, _puckmanAliveTexture, &sourceRect, &destinationRect);
+      |                                                   ^~~~~~~~~~~~~~~~~~~~
+C:\DevLib\SDL2-2.28.4\x86_64-w64-mingw32\include\SDL2/SDL_render.h:1410:58: note: expected 'SDL_Texture *' but argument is of type 'const SDL_Texture *'
+ 1410 |                                            SDL_Texture * texture,
+      |                                            ~~~~~~~~~~~~~~^~~~~~~
+In file included from D:/project/retro/puckman3\src\pckman_game.c:15:
+D:/project/retro/puckman3\include/pckman_game.h:18: warning: "PKM_MAIN_HEADER" redefined
+   18 | #define PKM_MAIN_HEADER HEIGHT 64
+      | 
+D:/project/retro/puckman3\include/pckman_game.h:17: note: this is the location of the previous definition
+   17 | #define PKM_MAIN_HEADER WIDTH 448
+      | 
+D:/project/retro/puckman3\include/pckman_game.h:22: warning: "PKM_MAIN_FOOTER" redefined
+   22 | #define PKM_MAIN_FOOTER HEIGHT 64
+      | 
+D:/project/retro/puckman3\include/pckman_game.h:21: note: this is the location of the previous definition
+   21 | #define PKM_MAIN_FOOTER WIDTH 448
+      | 
+In file included from D:/project/retro/puckman3\src\pckman_game.c:16:
+D:/project/retro/puckman3\include/pckman_state.h:56:1: warning: useless storage class specifier in empty declaration
+   56 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:62:1: warning: useless storage class specifier in empty declaration
+   62 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:71:1: warning: useless storage class specifier in empty declaration
+   71 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:76:1: warning: useless storage class specifier in empty declaration
+   76 | };
+      | ^
+D:/project/retro/puckman3\include/pckman_state.h:81:1: warning: useless storage class specifier in empty declaration
+   81 | };
+      | ^

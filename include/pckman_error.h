@@ -29,18 +29,26 @@
 #define PKM_ERROR_MAIN_STARTGAME_RENCLR 1010301 // SDL error when calling SDL_RenderClear
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// Errors pertaining to functions in the puckman file
+// Errors pertaining to functions in the audio file
 // Error_code format is: 1030XXYY
 //////////////////////////////////////////////////////////////////////////////////////////
-#define PKM_ERROR_PUCKMAN_LOAD_RNULL 1030101          // passing the main renderer as null
-#define PKM_ERROR_PUCKMAN_LOAD_BMPNOTFOUND 1030102    // the bmp is not found
-#define PKM_ERROR_PUCKMAN_ALIVESURFACE_NOLOAD 1030103 // error loading the alive bmp 2 surface
-#define PKM_ERROR_PUCKMAN_COLORKEY_ERROR 1030104      // error loading the color key
-#define PKM_ERROR_PUCKMAN_ALIVESURFACE_NOTEXT 1030105 // error creating the texture from surface
-#define PKM_ERROR_PUCKMAN_DEAD_BMPNOTFOUND 1030106    // puckman dying bmp not found
-#define PKM_ERORR_PUCKMAN_DEADSURACE_NOLOAD 1030107   // puckman dying bmp unable to load surface
-#define PKM_ERROR_PUCKMAN_DEADSURFACE_NOTEXT 1030108  // puckman dying texture unable to create
-#define PKM_ERROR_PUCKMAN_ANIMATE_RENDNULL 1030201    // renderer was pass null into animate
+#define PKM_ERROR_AUDIO_INIT_MIXER 1030101
+#define PKM_ERROR_AUDIO_LOAD_MUSIC 1030102 // passing the main renderer as null
+#define PKM_ERROR_AUDIO_PLAY_MUSIC 1030201
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Errors pertaining to functions in the puckman file
+// Error_code format is: 1040XXYY
+//////////////////////////////////////////////////////////////////////////////////////////
+#define PKM_ERROR_PUCKMAN_LOAD_RNULL 1040101          // passing the main renderer as null
+#define PKM_ERROR_PUCKMAN_LOAD_BMPNOTFOUND 1040102    // the bmp is not found
+#define PKM_ERROR_PUCKMAN_ALIVESURFACE_NOLOAD 1040103 // error loading the alive bmp 2 surface
+#define PKM_ERROR_PUCKMAN_COLORKEY_ERROR 1040104      // error loading the color key
+#define PKM_ERROR_PUCKMAN_ALIVESURFACE_NOTEXT 1040105 // error creating the texture from surface
+#define PKM_ERROR_PUCKMAN_DEAD_BMPNOTFOUND 1040106    // puckman dying bmp not found
+#define PKM_ERORR_PUCKMAN_DEADSURACE_NOLOAD 1040107   // puckman dying bmp unable to load surface
+#define PKM_ERROR_PUCKMAN_DEADSURFACE_NOTEXT 1040108  // puckman dying texture unable to create
+#define PKM_ERROR_PUCKMAN_ANIMATE_RENDNULL 1040201    // renderer was pass null into animate
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Errors pertaining to functions in the utility file
